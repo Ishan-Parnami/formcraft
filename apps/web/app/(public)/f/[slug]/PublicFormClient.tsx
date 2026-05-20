@@ -188,11 +188,48 @@ function FieldRenderer({
   );
 }
 
+function PasswordGate({ formId, onUnlock }: { formId: string; onUnlock: () => void }) {
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState("");
+  const verify = trpc.forms.verifyFormPassword.useMutation({
+    onSuccess: (data) => {
+      if (data.valid) { onUnlock(); } else { setError("Incorrect password. Please try again."); }
+    },
+  });
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-sm text-center">
+        <div className="text-3xl mb-3">🔒</div>
+        <h2 className="text-lg font-bold mb-1">Password required</h2>
+        <p className="text-sm text-gray-500 mb-5">Enter the password to access this form.</p>
+        <Input
+          type="password"
+          value={pw}
+          onChange={(e) => { setPw(e.target.value); setError(""); }}
+          onKeyDown={(e) => e.key === "Enter" && verify.mutate({ formId, password: pw })}
+          placeholder="Password"
+          className="mb-3"
+        />
+        {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
+        <Button
+          className="w-full bg-violet-600 hover:bg-violet-700"
+          onClick={() => verify.mutate({ formId, password: pw })}
+          disabled={verify.isPending || !pw}
+        >
+          {verify.isPending ? "Checking…" : "Continue"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function PublicFormClient({ form, theme }: PublicFormClientProps) {
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [startTime] = useState(() => Date.now());
+  const [unlocked, setUnlocked] = useState(false);
 
   const submitResponse = trpc.responses.submit.useMutation({
     onSuccess: () => {
@@ -229,6 +266,10 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
       completionTime,
     });
   };
+
+  if (settings.requirePassword && !unlocked) {
+    return <PasswordGate formId={form.id} onUnlock={() => setUnlocked(true)} />;
+  }
 
   const bgColor = (theme.bgColor as string) ?? "#ffffff";
   const primaryColor = (theme.primaryColor as string) ?? "#7c3aed";

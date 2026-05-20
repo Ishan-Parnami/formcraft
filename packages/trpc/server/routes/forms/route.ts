@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { eq, and } from "@formcraft/db";
+import { eq, and, ne } from "@formcraft/db";
 import db, { forms, fields } from "@formcraft/db";
 import { CreateFormSchema, UpdateFormSchema } from "@formcraft/schemas/form";
 import { generateUniqueSlug, slugify } from "@formcraft/utils";
+import bcrypt from "bcryptjs";
 import { publicProcedure, protectedProcedure, router } from "../../trpc";
 
 export const formsRouter = router({
@@ -149,6 +150,57 @@ export const formsRouter = router({
       }
 
       return newForm;
+    }),
+
+  updateSlug: protectedProcedure
+    .input(z.object({ formId: z.string().uuid(), slug: z.string().min(3).max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only") }))
+    .mutation(async ({ ctx, input }) => {
+      const [existing] = await db
+        .select({ id: forms.id })
+        .from(forms)
+        .where(and(eq(forms.slug, input.slug), ne(forms.id, input.formId)));
+      if (existing) throw new Error("This slug is already taken");
+
+      const [form] = await db
+        .update(forms)
+        .set({ slug: input.slug, updatedAt: new Date() })
+        .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
+        .returning();
+      return form;
+    }),
+
+  updatePassword: protectedProcedure
+    .input(z.object({ formId: z.string().uuid(), password: z.string().min(4).nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      let settingsPatch: Record<string, unknown>;
+      if (input.password === null) {
+        settingsPatch = { requirePassword: false, passwordHash: undefined };
+      } else {
+        const hash = await bcrypt.hash(input.password, 10);
+        settingsPatch = { requirePassword: true, passwordHash: hash };
+      }
+
+      const [current] = await db.select({ settings: forms.settings }).from(forms).where(eq(forms.id, input.formId));
+      const merged = { ...(current?.settings as Record<string, unknown> ?? {}), ...settingsPatch };
+
+      const [form] = await db
+        .update(forms)
+        .set({ settings: merged, updatedAt: new Date() })
+        .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
+        .returning();
+      return form;
+    }),
+
+  verifyFormPassword: publicProcedure
+    .input(z.object({ formId: z.string().uuid(), password: z.string() }))
+    .mutation(async ({ input }) => {
+      const [form] = await db.select({ settings: forms.settings }).from(forms).where(eq(forms.id, input.formId));
+      const settings = (form?.settings ?? {}) as Record<string, unknown>;
+      if (!settings.requirePassword) return { valid: true };
+      const hash = settings.passwordHash as string | undefined;
+      if (!hash) return { valid: false };
+      const valid = await bcrypt.compare(input.password, hash);
+      return { valid };
     }),
 
   generateSlug: publicProcedure

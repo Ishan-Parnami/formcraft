@@ -1,135 +1,158 @@
-# Turborepo starter
+# FormCraft
 
-This Turborepo starter is maintained by the Turborepo core team.
+A full-stack form builder SaaS. Create, publish, and analyse forms with a drag-and-drop builder, real-time analytics, email notifications, and a public explore page.
 
-## Using this example
+## Demo
 
-Run the following command:
+| Credential | Value |
+|---|---|
+| Email | `demo@formcraft.dev` |
+| Password | `Demo@1234` |
 
-```sh
-npx create-turbo@latest
-```
+Five sample forms are pre-seeded (3 public, 2 unlisted) with realistic responses and view counts.
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## Tech Stack
 
-### Apps and Packages
+| Layer | Technology |
+|---|---|
+| Monorepo | Turborepo + pnpm workspaces |
+| Frontend | Next.js 16 (App Router, Turbopack) |
+| Backend | Express + tRPC v11 |
+| Database | PostgreSQL + Drizzle ORM |
+| Auth | NextAuth v5 (JWT) |
+| Email | Resend + React Email |
+| Charts | Recharts |
+| QR Codes | qrcode.react |
+| Rate limiting | Upstash Redis (in-memory fallback) |
+| Styling | Tailwind CSS + shadcn/ui |
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+---
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Project Structure
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+formcraft-starter/
+├── apps/
+│   ├── web/          # Next.js frontend (port 3000)
+│   └── api/          # Express + tRPC server (port 3001)
+├── packages/
+│   ├── database/     # Drizzle schema, migrations, seed
+│   ├── trpc/         # tRPC router definitions
+│   ├── email/        # React Email templates + Resend
+│   ├── schemas/      # Shared Zod schemas
+│   ├── utils/        # Shared utilities
+│   └── services/     # Shared services
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## Features
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+- **Form builder** — drag-and-drop field ordering, 10 field types, conditional logic
+- **Theming** — 10 preset themes, custom colours, fonts, border radii, button styles
+- **Analytics** — response trend (30-day line chart), field-level stats (bar chart), top referrers
+- **Responses** — paginated table with expand/collapse, date filters, CSV export
+- **Email notifications** — new-response alert to form owner, submission confirmation to respondent
+- **Custom slugs** — change the public URL for any form
+- **Expiry dates** — forms automatically stop accepting responses after a set date
+- **Password protection** — gate forms behind a password (bcrypt-hashed)
+- **QR code** — download SVG QR code for any form from the settings page
+- **Clone** — duplicate a form with all its fields
+- **Explore page** — browse public forms with full-text search and featured section
+- **Rate limiting** — 5 submissions per IP per hour per form
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## Local Development
 
-```
-cd my-turborepo
+### Prerequisites
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+- Node.js 20+
+- pnpm 9+
+- PostgreSQL 15+ (or use the included `docker-compose.yml`)
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+### Setup
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+```bash
+# 1. Clone and install
+git clone <repo-url>
+cd formcraft-starter
+pnpm install
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+# 2. Start Postgres
+docker-compose up -d
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+# 3. Copy and fill environment files
+cp .env.example apps/web/.env.local
+cp .env.example apps/api/.env
+# Edit both files with your DATABASE_URL, AUTH_SECRET, etc.
 
-### Remote Caching
+# 4. Push schema and seed demo data
+pnpm --filter @formcraft/db db:push
+pnpm --filter @formcraft/db seed
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# 5. Start everything
+pnpm dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Open [http://localhost:3000](http://localhost:3000) and log in with the demo credentials above.
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+### Environment Variables
 
+See [`.env.example`](.env.example) for all variables. Required ones:
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `AUTH_SECRET` | 32-char random secret (`openssl rand -hex 32`) |
+| `NEXT_PUBLIC_APP_URL` | Frontend URL (default: `http://localhost:3000`) |
+
+Optional (graceful fallbacks in dev):
+
+| Variable | Description | Fallback |
+|---|---|---|
+| `RESEND_API_KEY` | Resend API key for email | Logs to console |
+| `EMAIL_FROM` | Sender address | `FormCraft <noreply@formcraft.dev>` |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis URL for rate limiting | In-memory |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis token | In-memory |
+
+---
+
+## Deployment
+
+### Frontend → Vercel
+
+1. Import the repo in Vercel
+2. Set **Root Directory** to `apps/web`
+3. Add all environment variables
+4. Deploy — `apps/web/vercel.json` configures the build automatically
+
+### API → Railway
+
+1. Create a new Railway project, connect the repo
+2. Set **Root Directory** to `.` (monorepo root)
+3. Add all environment variables + `PORT=3001`
+4. Railway reads `apps/api/railway.json` for build and start commands
+
+### Database → Neon / Supabase / Railway Postgres
+
+Run migrations after provisioning:
+
+```bash
+DATABASE_URL=<prod-url> pnpm --filter @formcraft/db db:push
+DATABASE_URL=<prod-url> pnpm --filter @formcraft/db seed
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+---
 
-## Useful Links
+## Scripts
 
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+| Command | Description |
+|---|---|
+| `pnpm dev` | Start web + api in watch mode |
+| `pnpm build` | Build all apps and packages |
+| `pnpm --filter @formcraft/db studio` | Open Drizzle Studio |
+| `pnpm --filter @formcraft/db seed` | Seed demo data |
+| `pnpm --filter @formcraft/web lint` | Lint frontend |

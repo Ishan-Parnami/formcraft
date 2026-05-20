@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { eq, and, desc, count, sql } from "@formcraft/db";
-import db, { responses, forms, fields } from "@formcraft/db";
+import { eq, and, desc, count } from "@formcraft/db";
+import db, { responses, forms, fields, users } from "@formcraft/db";
 import { SubmitResponseSchema, ListResponsesSchema } from "@formcraft/schemas/response";
 import { hashIp } from "@formcraft/utils";
+import { sendNewResponseEmail, sendResponseConfirmationEmail } from "@formcraft/email";
 import { publicProcedure, protectedProcedure, router } from "../../trpc";
 import type { Context } from "../../context";
 
@@ -63,6 +64,52 @@ export const responsesRouter = router({
         .returning();
       const response = insertResult[0];
       if (!response) throw new Error("Failed to save response");
+
+      // Fire-and-forget: send emails without blocking the response
+      void (async () => {
+        try {
+          const [owner] = await db
+            .select({ email: users.email, name: users.name })
+            .from(users)
+            .innerJoin(forms, eq(forms.userId, users.id))
+            .where(eq(forms.id, input.formId));
+
+          const formFields = await db
+            .select()
+            .from(fields)
+            .where(eq(fields.formId, input.formId))
+            .orderBy(fields.order);
+
+          const answers = (input.answers ?? {}) as Record<string, unknown>;
+          const keyAnswers = formFields.slice(0, 5).map((f) => ({
+            label: f.label,
+            value: Array.isArray(answers[f.id]) ? (answers[f.id] as string[]).join(", ") : String(answers[f.id] ?? ""),
+          }));
+
+          const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
+
+          if (owner?.email) {
+            await sendNewResponseEmail({
+              to: owner.email,
+              formTitle: form.title,
+              formId: form.id,
+              responseId: response.id,
+              keyAnswers,
+              dashboardUrl: `${appUrl}/forms/${form.id}/responses`,
+            });
+          }
+
+          if (input.respondentEmail) {
+            await sendResponseConfirmationEmail({
+              to: input.respondentEmail,
+              formTitle: form.title,
+              answers: keyAnswers,
+            });
+          }
+        } catch (err) {
+          console.error("[email] Failed to send notification:", err);
+        }
+      })();
 
       return { success: true, responseId: response.id };
     }),

@@ -1,0 +1,37 @@
+{
+  "name": "@formcraft/server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "dotenv -- tsx watch ./src/index.ts",
+    "build": "tsup",
+    "lint": "eslint src/*"
+  },
+  "devDependencies": {
+    "@formcraft/eslint-config": "workspace:*",
+    "@formcraft/typescript-config": "workspace:*",
+    "@swc/core": "^1.15.8",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.15.3",
+    "dotenv-cli": "^11.0.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@formcraft/trpc": "workspace:*",
+    "@scalar/express-api-reference": "^0.8.30",
+    "@trpc/server": "^11.8.1",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "trpc-to-openapi": "^3.1.0",
+    "zod": "^4.3.5"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@formcraft/utils",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@formcraft/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}

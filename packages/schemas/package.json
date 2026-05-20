@@ -1,0 +1,17 @@
+{
+  "name": "@formcraft/schemas",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./form": "./src/form.ts",
+    "./response": "./src/response.ts",
+    "./user": "./src/user.ts"
+  },
+  "devDependencies": {
+    "@formcraft/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "zod": "^4.3.5"
+  }
+}

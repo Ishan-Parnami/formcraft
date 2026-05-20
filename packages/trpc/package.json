@@ -1,0 +1,34 @@
+{
+  "name": "@formcraft/trpc",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@formcraft/eslint-config": "workspace:*",
+    "@formcraft/typescript-config": "workspace:*",
+    "dotenv-cli": "^11.0.0",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    "./server": "./server/index.ts",
+    "./client": "./client/index.ts"
+  },
+  "dependencies": {
+    "@formcraft/db": "workspace:*",
+    "@formcraft/email": "workspace:*",
+    "@formcraft/schemas": "workspace:*",
+    "@formcraft/utils": "workspace:*",
+    "@formcraft/services": "workspace:*",
+    "@trpc/client": "^11.8.1",
+    "@trpc/server": "^11.8.1",
+    "bcryptjs": "^3.0.2",
+    "trpc-to-openapi": "^3.1.0",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@formcraft/eslint-config": "workspace:*",
+    "@formcraft/typescript-config": "workspace:*",
+    "@types/bcryptjs": "^2.4.6",
+    "dotenv-cli": "^11.0.0",
+    "typescript": "^5.9.3"
+  }
+}

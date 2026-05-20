@@ -1,0 +1,3 @@
+{
+  "extends": ["@formcraft/typescript-config/node.json"]
+}

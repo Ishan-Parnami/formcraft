@@ -89,7 +89,7 @@ export default function FormSettingsPage({ params }: { params: Promise<{ formId:
   }
 
   return (
-    <div className="p-8 max-w-xl">
+    <div className="p-8 max-w-xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Link href={`/forms/${formId}`}>
           <Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>

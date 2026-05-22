@@ -23,7 +23,7 @@ export default async function FormOverviewPage({ params }: { params: Promise<{ f
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/f/${form.slug}`;
 
   return (
-    <div className="p-8">
+    <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">{form.title}</h1>

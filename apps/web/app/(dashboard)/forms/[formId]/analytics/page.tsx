@@ -78,7 +78,7 @@ export default function AnalyticsPage({ params }: { params: Promise<{ formId: st
   const { data: responsesData } = trpc.responses.list.useQuery({ formId, page: 1, limit: 5 });
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Link href={`/forms/${formId}`}>
           <Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>

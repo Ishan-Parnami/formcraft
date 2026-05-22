@@ -15,7 +15,7 @@ export default async function FormsPage() {
   const userForms = await db.select().from(forms).where(eq(forms.userId, session.user.id!));
 
   return (
-    <div className="p-8">
+    <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">My Forms</h1>
         <Link href="/forms/new">

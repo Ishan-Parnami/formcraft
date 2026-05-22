@@ -99,7 +99,7 @@ export default function ResponsesPage({ params }: { params: Promise<{ formId: st
   }
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Link href={`/forms/${formId}`}>

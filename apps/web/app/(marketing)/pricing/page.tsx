@@ -93,7 +93,7 @@ export default function PricingPage() {
             onClick={() => setAnnual(!annual)}
             className={`relative w-12 h-6 rounded-full transition-colors ${annual ? "bg-violet-600" : "bg-gray-300"}`}
           >
-            <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${annual ? "translate-x-7" : "translate-x-1"}`} />
+            <span className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform ${annual ? "translate-x-6" : "translate-x-0"}`} />
           </button>
           <span className={annual ? "font-semibold" : "text-gray-500"}>
             Annual <Badge className="ml-1 bg-green-100 text-green-700 border-0">Save 25%</Badge>

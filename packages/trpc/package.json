@@ -2,12 +2,6 @@
   "name": "@formcraft/trpc",
   "version": "1.0.0",
   "private": true,
-  "devDependencies": {
-    "@formcraft/eslint-config": "workspace:*",
-    "@formcraft/typescript-config": "workspace:*",
-    "dotenv-cli": "^11.0.0",
-    "typescript": "^5.9.3"
-  },
   "exports": {
     "./server": "./server/index.ts",
     "./client": "./client/index.ts"

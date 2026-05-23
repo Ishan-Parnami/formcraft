@@ -191,7 +191,7 @@ async function seed() {
   } else {
     const insertedUsers = await db
       .insert(users)
-      .values({ name: "Alex Rivera", email: "demo@formforge.dev", password: hashedPassword })
+      .values({ name: "Arjun Mehta", email: "demo@formforge.dev", password: hashedPassword })
       .returning();
     userId = insertedUsers[0]!.id;
   }
@@ -328,7 +328,8 @@ async function seed() {
   for (let i = 0; i < 47; i++) {
     const fieldMap: Record<string, unknown> = {};
     fieldMap[fields1[0]!.id] = pick(aliases) + Math.floor(Math.random() * 999);
-    if (Math.random() > 0.6) fieldMap[fields1[1]!.id] = `user${i}@example.com`;
+    const indianEmails = ["sneha.mehta","riya.sharma","rohan.verma","ananya.singh","rahul.gupta","kavita.patel","vikram.nair","arjun.reddy","aditya.kumar","nidhi.joshi"];
+    if (Math.random() > 0.6) fieldMap[fields1[1]!.id] = `${indianEmails[i % indianEmails.length]}@gmail.com`;
     fieldMap[fields1[2]!.id] = pick(eras);
     fieldMap[fields1[3]!.id] = 1 + Math.floor(Math.random() * 10);
     fieldMap[fields1[4]!.id] = pickMultiple(genres, 1, 4);
@@ -487,7 +488,8 @@ async function seed() {
     fieldMap[fields3[2]!.id] = pick(markets);
     if (Math.random() > 0.4) fieldMap[fields3[3]!.id] = 1000 + Math.floor(Math.random() * 50000);
     fieldMap[fields3[4]!.id] = 1 + Math.floor(Math.random() * 5);
-    if (Math.random() > 0.5) fieldMap[fields3[5]!.id] = `founder${i}@startup.io`;
+    const founderEmails = ["sneha","riya","rohan","ananya","rahul","kavita","vikram","arjun","aditya","nidhi"];
+    if (Math.random() > 0.5) fieldMap[fields3[5]!.id] = `${founderEmails[i % founderEmails.length]}@startup.in`;
     await db.insert(responses).values({
       formId: form3.id,
       answers: fieldMap,
@@ -545,7 +547,8 @@ async function seed() {
     fieldMap[fields4[1]!.id] = pick(replicantAnswers);
     fieldMap[fields4[2]!.id] = 7 + Math.floor(Math.random() * 4);
     if (Math.random() > 0.3) fieldMap[fields4[3]!.id] = pick(quotes);
-    if (Math.random() > 0.6) fieldMap[fields4[4]!.id] = `replicant${i}@tyrellcorp.net`;
+    const bladeRunnerEmails = ["sneha","riya","rohan","ananya","rahul","kavita","vikram","arjun","aditya","nidhi"];
+    if (Math.random() > 0.6) fieldMap[fields4[4]!.id] = `${bladeRunnerEmails[i % bladeRunnerEmails.length]}${i}@tyrellcorp.net`;
     await db.insert(responses).values({
       formId: form4.id,
       answers: fieldMap,

@@ -4,10 +4,10 @@ A full-stack form builder SaaS. Create, publish, and analyse forms with a drag-a
 
 ## Demo
 
-| Credential | Value |
-|---|---|
-| Email | `demo@formforge.dev` |
-| Password | `Demo@1234` |
+| Credential | Value                |
+| ---------- | -------------------- |
+| Email      | `demo@formforge.dev` |
+| Password   | `Demo@1234`          |
 
 Five sample forms are pre-seeded (3 public, 2 unlisted) with realistic responses and view counts.
 
@@ -15,18 +15,18 @@ Five sample forms are pre-seeded (3 public, 2 unlisted) with realistic responses
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Monorepo | Turborepo + pnpm workspaces |
-| Frontend | Next.js 16 (App Router, Turbopack) |
-| Backend | Express + tRPC v11 |
-| Database | PostgreSQL + Drizzle ORM |
-| Auth | NextAuth v5 (JWT) |
-| Email | Resend + React Email |
-| Charts | Recharts |
-| QR Codes | qrcode.react |
+| Layer         | Technology                         |
+| ------------- | ---------------------------------- |
+| Monorepo      | Turborepo + pnpm workspaces        |
+| Frontend      | Next.js 16 (App Router, Turbopack) |
+| Backend       | Express + tRPC v11                 |
+| Database      | PostgreSQL + Drizzle ORM           |
+| Auth          | NextAuth v5 (JWT)                  |
+| Email         | Resend + React Email               |
+| Charts        | Recharts                           |
+| QR Codes      | qrcode.react                       |
 | Rate limiting | Upstash Redis (in-memory fallback) |
-| Styling | Tailwind CSS + shadcn/ui |
+| Styling       | Tailwind CSS + shadcn/ui           |
 
 ---
 
@@ -103,20 +103,20 @@ Open [http://localhost:3000](http://localhost:3000) and log in with the demo cre
 
 See [`.env.example`](.env.example) for all variables. Required ones:
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `AUTH_SECRET` | 32-char random secret (`openssl rand -hex 32`) |
+| Variable              | Description                                     |
+| --------------------- | ----------------------------------------------- |
+| `DATABASE_URL`        | PostgreSQL connection string                    |
+| `AUTH_SECRET`         | 32-char random secret (`openssl rand -hex 32`)  |
 | `NEXT_PUBLIC_APP_URL` | Frontend URL (default: `http://localhost:3000`) |
 
 Optional (graceful fallbacks in dev):
 
-| Variable | Description | Fallback |
-|---|---|---|
-| `RESEND_API_KEY` | Resend API key for email | Logs to console |
-| `EMAIL_FROM` | Sender address | `FormForge <noreply@formforge.dev>` |
-| `UPSTASH_REDIS_REST_URL` | Upstash Redis URL for rate limiting | In-memory |
-| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis token | In-memory |
+| Variable                   | Description                         | Fallback                            |
+| -------------------------- | ----------------------------------- | ----------------------------------- |
+| `RESEND_API_KEY`           | Resend API key for email            | Logs to console                     |
+| `EMAIL_FROM`               | Sender address                      | `FormForge <noreply@formforge.dev>` |
+| `UPSTASH_REDIS_REST_URL`   | Upstash Redis URL for rate limiting | In-memory                           |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis token                 | In-memory                           |
 
 ---
 
@@ -149,10 +149,10 @@ DATABASE_URL=<prod-url> pnpm --filter @formforge/db seed
 
 ## Scripts
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Start web + api in watch mode |
-| `pnpm build` | Build all apps and packages |
-| `pnpm --filter @formforge/db studio` | Open Drizzle Studio |
-| `pnpm --filter @formforge/db seed` | Seed demo data |
-| `pnpm --filter @formforge/web lint` | Lint frontend |
+| Command                              | Description                   |
+| ------------------------------------ | ----------------------------- |
+| `pnpm dev`                           | Start web + api in watch mode |
+| `pnpm build`                         | Build all apps and packages   |
+| `pnpm --filter @formforge/db studio` | Open Drizzle Studio           |
+| `pnpm --filter @formforge/db seed`   | Seed demo data                |
+| `pnpm --filter @formforge/web lint`  | Lint frontend                 |

@@ -12,17 +12,15 @@ export const usersRouter = router({
     return safe;
   }),
 
-  updateProfile: protectedProcedure
-    .input(UpdateProfileSchema)
-    .mutation(async ({ ctx, input }) => {
-      const updateResult = await db
-        .update(users)
-        .set({ ...input, updatedAt: new Date() })
-        .where(eq(users.id, ctx.user.id))
-        .returning();
-      const updated = updateResult[0];
-      if (!updated) throw new Error("User not found");
-      const { password: _p, ...safe } = updated;
-      return safe;
-    }),
+  updateProfile: protectedProcedure.input(UpdateProfileSchema).mutation(async ({ ctx, input }) => {
+    const updateResult = await db
+      .update(users)
+      .set({ ...input, updatedAt: new Date() })
+      .where(eq(users.id, ctx.user.id))
+      .returning();
+    const updated = updateResult[0];
+    if (!updated) throw new Error("User not found");
+    const { password: _p, ...safe } = updated;
+    return safe;
+  }),
 });

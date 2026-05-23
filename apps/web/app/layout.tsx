@@ -9,7 +9,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "FormForge — Build Beautiful Forms",
-  description: "Create, share, and analyze forms in minutes. Typeform-style form builder with analytics and a theme gallery.",
+  description:
+    "Create, share, and analyze forms in minutes. Typeform-style form builder with analytics and a theme gallery.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

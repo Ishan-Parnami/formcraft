@@ -17,7 +17,11 @@ export default function SettingsPage() {
     onError: () => toast.error("Failed to update profile"),
   });
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<UpdateProfileInput>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<UpdateProfileInput>({
     resolver: zodResolver(UpdateProfileSchema),
   });
 
@@ -30,11 +34,7 @@ export default function SettingsPage() {
         <CardContent className="p-6 space-y-4">
           <div>
             <Label>Name</Label>
-            <Input
-              {...register("name")}
-              defaultValue={user?.name ?? ""}
-              className="mt-1"
-            />
+            <Input {...register("name")} defaultValue={user?.name ?? ""} className="mt-1" />
             {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
           </div>
           <div>

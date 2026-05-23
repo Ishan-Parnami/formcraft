@@ -27,7 +27,12 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
   }
 
   const from = process.env["EMAIL_FROM"] ?? "FormForge <noreply@formforge.dev>";
-  const { error } = await client.emails.send({ from, to: options.to, subject: options.subject, react: options.react });
+  const { error } = await client.emails.send({
+    from,
+    to: options.to,
+    subject: options.subject,
+    react: options.react,
+  });
   if (error) console.error("[email] Resend error:", error);
 }
 
@@ -54,7 +59,10 @@ export async function sendResponseConfirmationEmail(opts: {
   await sendEmail({
     to: opts.to,
     subject: `Your response to "${opts.formTitle}" was received`,
-    react: React.createElement(ResponseConfirmationEmail, { formTitle: opts.formTitle, answers: opts.answers }),
+    react: React.createElement(ResponseConfirmationEmail, {
+      formTitle: opts.formTitle,
+      answers: opts.answers,
+    }),
   });
 }
 

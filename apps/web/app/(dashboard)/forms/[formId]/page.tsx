@@ -4,11 +4,15 @@ import { redirect, notFound } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
-import { Edit, BarChart3, MessageSquare, Settings, Eye, Copy } from "lucide-react";
+import { Edit, BarChart3, MessageSquare, Settings, Eye } from "lucide-react";
 import db, { forms, fields, responses } from "@formforge/db";
 import { eq, count } from "@formforge/db";
 
-export default async function FormOverviewPage({ params }: { params: Promise<{ formId: string }> }) {
+export default async function FormOverviewPage({
+  params,
+}: {
+  params: Promise<{ formId: string }>;
+}) {
   const { formId } = await params;
   const session = await auth();
   if (!session?.user) redirect("/login");
@@ -17,7 +21,10 @@ export default async function FormOverviewPage({ params }: { params: Promise<{ f
   if (!form || form.userId !== session.user.id) notFound();
 
   const formFields = await db.select().from(fields).where(eq(fields.formId, formId));
-  const totalResponsesResult = await db.select({ total: count() }).from(responses).where(eq(responses.formId, formId));
+  const totalResponsesResult = await db
+    .select({ total: count() })
+    .from(responses)
+    .where(eq(responses.formId, formId));
   const totalResponses = totalResponsesResult[0]?.total ?? 0;
 
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/f/${form.slug}`;
@@ -69,9 +76,13 @@ export default async function FormOverviewPage({ params }: { params: Promise<{ f
         <div className="mb-8 p-4 bg-blue-50 rounded-lg">
           <p className="text-sm font-medium text-blue-800 mb-2">Form URL</p>
           <div className="flex items-center gap-2">
-            <code className="text-xs bg-white px-3 py-2 rounded border flex-1 truncate">{publicUrl}</code>
+            <code className="text-xs bg-white px-3 py-2 rounded border flex-1 truncate">
+              {publicUrl}
+            </code>
             <Link href={`/f/${form.slug}`} target="_blank">
-              <Button size="sm" variant="outline" className="shrink-0"><Eye className="h-3 w-3 mr-1" /> View</Button>
+              <Button size="sm" variant="outline" className="shrink-0">
+                <Eye className="h-3 w-3 mr-1" /> View
+              </Button>
             </Link>
           </div>
         </div>

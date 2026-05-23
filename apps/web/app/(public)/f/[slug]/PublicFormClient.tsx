@@ -9,7 +9,13 @@ import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import type { SelectField } from "@formforge/db";
 import { Star } from "lucide-react";
 
@@ -109,10 +115,7 @@ function FieldRenderer({
 
       {field.type === "checkbox" && (
         <div className="flex items-center gap-2 mt-2">
-          <Checkbox
-            checked={!!value}
-            onCheckedChange={(v) => onChange(v)}
-          />
+          <Checkbox checked={!!value} onCheckedChange={(v) => onChange(v)} />
           <span className="text-sm">{field.placeholder ?? field.label}</span>
         </div>
       )}
@@ -126,7 +129,9 @@ function FieldRenderer({
           {options.map((opt) => (
             <div key={opt.value} className="flex items-center gap-2">
               <RadioGroupItem value={opt.value} id={`${field.id}-${opt.value}`} />
-              <Label htmlFor={`${field.id}-${opt.value}`} className="font-normal">{opt.label}</Label>
+              <Label htmlFor={`${field.id}-${opt.value}`} className="font-normal">
+                {opt.label}
+              </Label>
             </div>
           ))}
         </RadioGroup>
@@ -143,10 +148,14 @@ function FieldRenderer({
                   checked={selected}
                   onCheckedChange={(checked) => {
                     const current = (value as string[]) ?? [];
-                    onChange(checked ? [...current, opt.value] : current.filter((v) => v !== opt.value));
+                    onChange(
+                      checked ? [...current, opt.value] : current.filter((v) => v !== opt.value),
+                    );
                   }}
                 />
-                <Label htmlFor={`${field.id}-${opt.value}`} className="font-normal">{opt.label}</Label>
+                <Label htmlFor={`${field.id}-${opt.value}`} className="font-normal">
+                  {opt.label}
+                </Label>
               </div>
             );
           })}
@@ -160,7 +169,9 @@ function FieldRenderer({
           </SelectTrigger>
           <SelectContent>
             {options.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -169,12 +180,7 @@ function FieldRenderer({
       {field.type === "rating" && (
         <div className="flex gap-1 mt-2">
           {Array.from({ length: maxRating }, (_, i) => i + 1).map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => onChange(n)}
-              className="p-1"
-            >
+            <button key={n} type="button" onClick={() => onChange(n)} className="p-1">
               <Star
                 className={`h-6 w-6 ${(value as number) >= n ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
               />
@@ -193,7 +199,11 @@ function PasswordGate({ formId, onUnlock }: { formId: string; onUnlock: () => vo
   const [error, setError] = useState("");
   const verify = trpc.forms.verifyFormPassword.useMutation({
     onSuccess: (data) => {
-      if (data.valid) { onUnlock(); } else { setError("Incorrect password. Please try again."); }
+      if (data.valid) {
+        onUnlock();
+      } else {
+        setError("Incorrect password. Please try again.");
+      }
     },
   });
 
@@ -206,7 +216,10 @@ function PasswordGate({ formId, onUnlock }: { formId: string; onUnlock: () => vo
         <Input
           type="password"
           value={pw}
-          onChange={(e) => { setPw(e.target.value); setError(""); }}
+          onChange={(e) => {
+            setPw(e.target.value);
+            setError("");
+          }}
           onKeyDown={(e) => e.key === "Enter" && verify.mutate({ formId, password: pw })}
           placeholder="Password"
           className="mb-3"
@@ -246,7 +259,13 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
     const newErrors: Record<string, string> = {};
     for (const field of form.fields) {
       const val = answers[field.id];
-      if (field.required && (val === undefined || val === null || val === "" || (Array.isArray(val) && val.length === 0))) {
+      if (
+        field.required &&
+        (val === undefined ||
+          val === null ||
+          val === "" ||
+          (Array.isArray(val) && val.length === 0))
+      ) {
         newErrors[field.id] = "This field is required";
       }
       if (field.type === "email" && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(val))) {
@@ -279,19 +298,16 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
   const buttonStyle = (theme.buttonStyle as string) ?? "filled";
 
   return (
-    <div
-      style={{ backgroundColor: bgColor, color: textColor, fontFamily, minHeight: "100vh" }}
-    >
+    <div style={{ backgroundColor: bgColor, color: textColor, fontFamily, minHeight: "100vh" }}>
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: textColor }}>{form.title}</h1>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: textColor }}>
+            {form.title}
+          </h1>
           {form.description && <p className="text-gray-500">{form.description}</p>}
         </div>
 
-        <div
-          className="bg-white shadow-sm p-8"
-          style={{ borderRadius }}
-        >
+        <div className="bg-white shadow-sm p-8" style={{ borderRadius }}>
           {form.fields.map((field) => (
             <FieldRenderer
               key={field.id}
@@ -322,7 +338,9 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
             }}
             className="mt-4 w-full border"
           >
-            {submitResponse.isPending ? "Submitting…" : (settings.submitButtonText as string) ?? "Submit"}
+            {submitResponse.isPending
+              ? "Submitting…"
+              : ((settings.submitButtonText as string) ?? "Submit")}
           </Button>
         </div>
       </div>

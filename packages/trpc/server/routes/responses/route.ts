@@ -24,122 +24,121 @@ function checkRateLimit(formId: string, ipHash: string): boolean {
 }
 
 export const responsesRouter = router({
-  submit: publicProcedure
-    .input(SubmitResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const typedCtx = ctx as Context & { req: { ip?: string; headers: Record<string, string> } };
-      const ip = typedCtx.req?.ip ?? "unknown";
-      const ipHash = hashIp(ip);
+  submit: publicProcedure.input(SubmitResponseSchema).mutation(async ({ input, ctx }) => {
+    const typedCtx = ctx as Context & { req: { ip?: string; headers: Record<string, string> } };
+    const ip = typedCtx.req?.ip ?? "unknown";
+    const ipHash = hashIp(ip);
 
-      if (!checkRateLimit(input.formId, ipHash)) {
-        throw new Error("Too many submissions. Try again later.");
-      }
+    if (!checkRateLimit(input.formId, ipHash)) {
+      throw new Error("Too many submissions. Try again later.");
+    }
 
-      const [form] = await db.select().from(forms).where(eq(forms.id, input.formId));
-      if (!form || !form.isPublished) throw new Error("Form not available");
+    const [form] = await db.select().from(forms).where(eq(forms.id, input.formId));
+    if (!form || !form.isPublished) throw new Error("Form not available");
 
-      const settings = form.settings as { maxResponses?: number; expiresAt?: string } | null;
-      if (settings?.expiresAt && new Date(settings.expiresAt) < new Date()) {
-        throw new Error("This form has expired");
-      }
-      if (settings?.maxResponses) {
-        const countResult = await db
-          .select({ value: count() })
-          .from(responses)
-          .where(eq(responses.formId, input.formId));
-        const currentCount = countResult[0]?.value ?? 0;
-        if (currentCount >= settings.maxResponses) throw new Error("This form has reached its response limit");
-      }
-
-      const insertResult = await db
-        .insert(responses)
-        .values({
-          formId: input.formId,
-          respondentEmail: input.respondentEmail,
-          ipHash,
-          userAgent: (typedCtx.req?.headers?.["user-agent"] as string | undefined) ?? undefined,
-          answers: input.answers,
-          completionTime: input.completionTime,
-        })
-        .returning();
-      const response = insertResult[0];
-      if (!response) throw new Error("Failed to save response");
-
-      // Fire-and-forget: send emails without blocking the response
-      void (async () => {
-        try {
-          const [owner] = await db
-            .select({ email: users.email, name: users.name })
-            .from(users)
-            .innerJoin(forms, eq(forms.userId, users.id))
-            .where(eq(forms.id, input.formId));
-
-          const formFields = await db
-            .select()
-            .from(fields)
-            .where(eq(fields.formId, input.formId))
-            .orderBy(fields.order);
-
-          const answers = (input.answers ?? {}) as Record<string, unknown>;
-          const keyAnswers = formFields.slice(0, 5).map((f) => ({
-            label: f.label,
-            value: Array.isArray(answers[f.id]) ? (answers[f.id] as string[]).join(", ") : String(answers[f.id] ?? ""),
-          }));
-
-          const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
-
-          if (owner?.email) {
-            await sendNewResponseEmail({
-              to: owner.email,
-              formTitle: form.title,
-              formId: form.id,
-              responseId: response.id,
-              keyAnswers,
-              dashboardUrl: `${appUrl}/forms/${form.id}/responses`,
-            });
-          }
-
-          if (input.respondentEmail) {
-            await sendResponseConfirmationEmail({
-              to: input.respondentEmail,
-              formTitle: form.title,
-              answers: keyAnswers,
-            });
-          }
-        } catch (err) {
-          console.error("[email] Failed to send notification:", err);
-        }
-      })();
-
-      return { success: true, responseId: response.id };
-    }),
-
-  list: protectedProcedure
-    .input(ListResponsesSchema)
-    .query(async ({ ctx, input }) => {
-      const [form] = await db
-        .select()
-        .from(forms)
-        .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
-      if (!form) throw new Error("Form not found");
-
-      const offset = (input.page - 1) * input.limit;
-      const data = await db
-        .select()
-        .from(responses)
-        .where(eq(responses.formId, input.formId))
-        .orderBy(desc(responses.createdAt))
-        .limit(input.limit)
-        .offset(offset);
-
-      const totalResult = await db
+    const settings = form.settings as { maxResponses?: number; expiresAt?: string } | null;
+    if (settings?.expiresAt && new Date(settings.expiresAt) < new Date()) {
+      throw new Error("This form has expired");
+    }
+    if (settings?.maxResponses) {
+      const countResult = await db
         .select({ value: count() })
         .from(responses)
         .where(eq(responses.formId, input.formId));
-      const total = totalResult[0]?.value ?? 0;
+      const currentCount = countResult[0]?.value ?? 0;
+      if (currentCount >= settings.maxResponses)
+        throw new Error("This form has reached its response limit");
+    }
 
-      return { responses: data, total, page: input.page };
-    }),
+    const insertResult = await db
+      .insert(responses)
+      .values({
+        formId: input.formId,
+        respondentEmail: input.respondentEmail,
+        ipHash,
+        userAgent: (typedCtx.req?.headers?.["user-agent"] as string | undefined) ?? undefined,
+        answers: input.answers,
+        completionTime: input.completionTime,
+      })
+      .returning();
+    const response = insertResult[0];
+    if (!response) throw new Error("Failed to save response");
+
+    // Fire-and-forget: send emails without blocking the response
+    void (async () => {
+      try {
+        const [owner] = await db
+          .select({ email: users.email, name: users.name })
+          .from(users)
+          .innerJoin(forms, eq(forms.userId, users.id))
+          .where(eq(forms.id, input.formId));
+
+        const formFields = await db
+          .select()
+          .from(fields)
+          .where(eq(fields.formId, input.formId))
+          .orderBy(fields.order);
+
+        const answers = (input.answers ?? {}) as Record<string, unknown>;
+        const keyAnswers = formFields.slice(0, 5).map((f) => ({
+          label: f.label,
+          value: Array.isArray(answers[f.id])
+            ? (answers[f.id] as string[]).join(", ")
+            : String(answers[f.id] ?? ""),
+        }));
+
+        const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
+
+        if (owner?.email) {
+          await sendNewResponseEmail({
+            to: owner.email,
+            formTitle: form.title,
+            formId: form.id,
+            responseId: response.id,
+            keyAnswers,
+            dashboardUrl: `${appUrl}/forms/${form.id}/responses`,
+          });
+        }
+
+        if (input.respondentEmail) {
+          await sendResponseConfirmationEmail({
+            to: input.respondentEmail,
+            formTitle: form.title,
+            answers: keyAnswers,
+          });
+        }
+      } catch (err) {
+        console.error("[email] Failed to send notification:", err);
+      }
+    })();
+
+    return { success: true, responseId: response.id };
+  }),
+
+  list: protectedProcedure.input(ListResponsesSchema).query(async ({ ctx, input }) => {
+    const [form] = await db
+      .select()
+      .from(forms)
+      .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
+    if (!form) throw new Error("Form not found");
+
+    const offset = (input.page - 1) * input.limit;
+    const data = await db
+      .select()
+      .from(responses)
+      .where(eq(responses.formId, input.formId))
+      .orderBy(desc(responses.createdAt))
+      .limit(input.limit)
+      .offset(offset);
+
+    const totalResult = await db
+      .select({ value: count() })
+      .from(responses)
+      .where(eq(responses.formId, input.formId));
+    const total = totalResult[0]?.value ?? 0;
+
+    return { responses: data, total, page: input.page };
+  }),
 
   getById: protectedProcedure
     .input(z.object({ responseId: z.string().uuid() }))
@@ -187,14 +186,8 @@ export const responsesRouter = router({
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
       if (!form) throw new Error("Form not found");
 
-      const formFields = await db
-        .select()
-        .from(fields)
-        .where(eq(fields.formId, input.formId));
-      const data = await db
-        .select()
-        .from(responses)
-        .where(eq(responses.formId, input.formId));
+      const formFields = await db.select().from(fields).where(eq(fields.formId, input.formId));
+      const data = await db.select().from(responses).where(eq(responses.formId, input.formId));
 
       const headers = ["id", "submitted_at", "email", ...formFields.map((f) => f.label)];
       const rows = data.map((r) => {

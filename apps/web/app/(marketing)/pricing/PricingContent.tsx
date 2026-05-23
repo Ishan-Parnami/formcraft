@@ -71,16 +71,28 @@ export default function PricingContent({ isLoggedIn }: { isLoggedIn: boolean }) 
     <div className="min-h-screen bg-white">
       <nav className="border-b">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-violet-600">FormForge</Link>
+          <Link href="/" className="text-xl font-bold text-violet-600">
+            FormForge
+          </Link>
           <div className="flex gap-3">
             {isLoggedIn ? (
               <Link href="/dashboard">
-                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Go to Dashboard →</Button>
+                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
+                  Go to Dashboard →
+                </Button>
               </Link>
             ) : (
               <>
-                <Link href="/login"><Button variant="ghost" size="sm">Log in</Button></Link>
-                <Link href="/register"><Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get started</Button></Link>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    Log in
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
+                    Get started
+                  </Button>
+                </Link>
               </>
             )}
           </div>
@@ -101,7 +113,9 @@ export default function PricingContent({ isLoggedIn }: { isLoggedIn: boolean }) 
             onClick={() => setAnnual(!annual)}
             className={`relative w-12 h-6 rounded-full transition-colors ${annual ? "bg-violet-600" : "bg-gray-300"}`}
           >
-            <span className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform ${annual ? "translate-x-6" : "translate-x-0"}`} />
+            <span
+              className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform ${annual ? "translate-x-6" : "translate-x-0"}`}
+            />
           </button>
           <span className={annual ? "font-semibold" : "text-gray-500"}>
             Annual <Badge className="ml-1 bg-green-100 text-green-700 border-0">Save 25%</Badge>

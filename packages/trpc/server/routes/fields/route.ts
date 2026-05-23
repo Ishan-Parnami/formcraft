@@ -16,10 +16,7 @@ export const fieldsRouter = router({
       if (!form) throw new Error("Form not found");
 
       // Get next order
-      const existingFields = await db
-        .select()
-        .from(fields)
-        .where(eq(fields.formId, input.formId));
+      const existingFields = await db.select().from(fields).where(eq(fields.formId, input.formId));
       const maxOrder = existingFields.reduce((m, f) => Math.max(m, f.order), -1);
 
       const [field] = await db
@@ -53,11 +50,7 @@ export const fieldsRouter = router({
         .where(and(eq(forms.id, field.formId), eq(forms.userId, ctx.user.id)));
       if (!form) throw new Error("Unauthorized");
 
-      const [updated] = await db
-        .update(fields)
-        .set(data)
-        .where(eq(fields.id, fieldId))
-        .returning();
+      const [updated] = await db.update(fields).set(data).where(eq(fields.id, fieldId)).returning();
       return updated;
     }),
 
@@ -76,20 +69,18 @@ export const fieldsRouter = router({
       return { success: true };
     }),
 
-  reorder: protectedProcedure
-    .input(ReorderFieldsSchema)
-    .mutation(async ({ ctx, input }) => {
-      const [form] = await db
-        .select()
-        .from(forms)
-        .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
-      if (!form) throw new Error("Form not found");
+  reorder: protectedProcedure.input(ReorderFieldsSchema).mutation(async ({ ctx, input }) => {
+    const [form] = await db
+      .select()
+      .from(forms)
+      .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
+    if (!form) throw new Error("Form not found");
 
-      await Promise.all(
-        input.fieldIds.map((id, index) =>
-          db.update(fields).set({ order: index }).where(eq(fields.id, id))
-        )
-      );
-      return { success: true };
-    }),
+    await Promise.all(
+      input.fieldIds.map((id, index) =>
+        db.update(fields).set({ order: index }).where(eq(fields.id, id)),
+      ),
+    );
+    return { success: true };
+  }),
 });

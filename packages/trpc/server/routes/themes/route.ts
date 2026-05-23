@@ -8,10 +8,8 @@ export const themesRouter = router({
     return db.select().from(themes);
   }),
 
-  getBySlug: publicProcedure
-    .input(z.object({ slug: z.string() }))
-    .query(async ({ input }) => {
-      const [theme] = await db.select().from(themes).where(eq(themes.slug, input.slug));
-      return theme ?? null;
-    }),
+  getBySlug: publicProcedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+    const [theme] = await db.select().from(themes).where(eq(themes.slug, input.slug));
+    return theme ?? null;
+  }),
 });

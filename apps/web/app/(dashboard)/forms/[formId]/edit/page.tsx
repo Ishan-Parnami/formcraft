@@ -8,14 +8,39 @@ import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "@formforge/trpc/client";
 import type { CreateFieldInput } from "@formforge/schemas/form";
 import {
-  GripVertical, Plus, Trash2, Eye, Globe, Lock,
-  Type, AlignLeft, Mail, Hash, ChevronDown, CheckSquare, Star, Calendar, List,
+  GripVertical,
+  Plus,
+  Trash2,
+  Eye,
+  Globe,
+  Lock,
+  Type,
+  AlignLeft,
+  Mail,
+  Hash,
+  ChevronDown,
+  CheckSquare,
+  Star,
+  Calendar,
+  List,
 } from "lucide-react";
 
 // Use tRPC output type so dates are serialized strings, matching what tRPC sends over the wire
@@ -44,7 +69,9 @@ function SortableField({
   onSelect: () => void;
   onDelete: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: field.id });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: field.id,
+  });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
   return (
@@ -69,10 +96,17 @@ function SortableField({
         <p className="text-sm font-medium truncate">{field.label}</p>
         <p className="text-xs text-gray-400">{field.type.replace(/_/g, " ")}</p>
       </div>
-      {field.required && <Badge variant="outline" className="text-xs border-red-200 text-red-500">Required</Badge>}
+      {field.required && (
+        <Badge variant="outline" className="text-xs border-red-200 text-red-500">
+          Required
+        </Badge>
+      )}
       <button
         type="button"
-        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
         className="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <Trash2 className="h-4 w-4" />
@@ -81,7 +115,13 @@ function SortableField({
   );
 }
 
-function FieldConfig({ field, onUpdate }: { field: TRPCField; onUpdate: (data: Partial<TRPCField>) => void }) {
+function FieldConfig({
+  field,
+  onUpdate,
+}: {
+  field: TRPCField;
+  onUpdate: (data: Partial<TRPCField>) => void;
+}) {
   const validations = (field.validations ?? {}) as Record<string, unknown>;
   const options = (field.options ?? []) as Array<{ label: string; value: string }>;
 
@@ -132,7 +172,9 @@ function FieldConfig({ field, onUpdate }: { field: TRPCField; onUpdate: (data: P
               type="number"
               value={(validations.minLength as number) ?? ""}
               onChange={(e) =>
-                onUpdate({ validations: { ...validations, minLength: parseInt(e.target.value) || undefined } })
+                onUpdate({
+                  validations: { ...validations, minLength: parseInt(e.target.value) || undefined },
+                })
               }
               className="mt-1 text-sm"
             />
@@ -143,7 +185,9 @@ function FieldConfig({ field, onUpdate }: { field: TRPCField; onUpdate: (data: P
               type="number"
               value={(validations.maxLength as number) ?? ""}
               onChange={(e) =>
-                onUpdate({ validations: { ...validations, maxLength: parseInt(e.target.value) || undefined } })
+                onUpdate({
+                  validations: { ...validations, maxLength: parseInt(e.target.value) || undefined },
+                })
               }
               className="mt-1 text-sm"
             />
@@ -159,7 +203,9 @@ function FieldConfig({ field, onUpdate }: { field: TRPCField; onUpdate: (data: P
               type="number"
               value={(validations.min as number) ?? ""}
               onChange={(e) =>
-                onUpdate({ validations: { ...validations, min: parseInt(e.target.value) || undefined } })
+                onUpdate({
+                  validations: { ...validations, min: parseInt(e.target.value) || undefined },
+                })
               }
               className="mt-1 text-sm"
             />
@@ -170,7 +216,9 @@ function FieldConfig({ field, onUpdate }: { field: TRPCField; onUpdate: (data: P
               type="number"
               value={(validations.max as number) ?? ""}
               onChange={(e) =>
-                onUpdate({ validations: { ...validations, max: parseInt(e.target.value) || undefined } })
+                onUpdate({
+                  validations: { ...validations, max: parseInt(e.target.value) || undefined },
+                })
               }
               className="mt-1 text-sm"
             />
@@ -187,7 +235,10 @@ function FieldConfig({ field, onUpdate }: { field: TRPCField; onUpdate: (data: P
               variant="outline"
               className="h-7 text-xs"
               onClick={() => {
-                const newOption = { label: `Option ${options.length + 1}`, value: `option_${options.length + 1}` };
+                const newOption = {
+                  label: `Option ${options.length + 1}`,
+                  value: `option_${options.length + 1}`,
+                };
                 onUpdate({ options: [...options, newOption] });
               }}
             >
@@ -200,7 +251,11 @@ function FieldConfig({ field, onUpdate }: { field: TRPCField; onUpdate: (data: P
                 value={opt.label}
                 onChange={(e) => {
                   const updated = [...options];
-                  updated[i] = { ...opt, label: e.target.value, value: e.target.value.toLowerCase().replace(/\s+/g, "_") };
+                  updated[i] = {
+                    ...opt,
+                    label: e.target.value,
+                    value: e.target.value.toLowerCase().replace(/\s+/g, "_"),
+                  };
                   onUpdate({ options: updated });
                 }}
                 className="text-sm"
@@ -243,11 +298,19 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
 
   const { data: formData, isLoading } = trpc.forms.getById.useQuery({ formId });
   const updateForm = trpc.forms.update.useMutation();
-  const publishForm = trpc.forms.publish.useMutation({ onSuccess: () => utils.forms.getById.invalidate({ formId }) });
-  const unpublishForm = trpc.forms.unpublish.useMutation({ onSuccess: () => utils.forms.getById.invalidate({ formId }) });
-  const createField = trpc.fields.create.useMutation({ onSuccess: () => utils.forms.getById.invalidate({ formId }) });
+  const publishForm = trpc.forms.publish.useMutation({
+    onSuccess: () => utils.forms.getById.invalidate({ formId }),
+  });
+  const unpublishForm = trpc.forms.unpublish.useMutation({
+    onSuccess: () => utils.forms.getById.invalidate({ formId }),
+  });
+  const createField = trpc.fields.create.useMutation({
+    onSuccess: () => utils.forms.getById.invalidate({ formId }),
+  });
   const updateField = trpc.fields.update.useMutation();
-  const deleteField = trpc.fields.delete.useMutation({ onSuccess: () => utils.forms.getById.invalidate({ formId }) });
+  const deleteField = trpc.fields.delete.useMutation({
+    onSuccess: () => utils.forms.getById.invalidate({ formId }),
+  });
   const reorderFields = trpc.fields.reorder.useMutation();
 
   const [title, setTitle] = useState("");
@@ -259,7 +322,9 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
   useEffect(() => {
     if (formData) {
       setTitle(formData.title);
-      setLocalFields((formData.fields ?? []).sort((a: TRPCField, b: TRPCField) => a.order - b.order));
+      setLocalFields(
+        (formData.fields ?? []).sort((a: TRPCField, b: TRPCField) => a.order - b.order),
+      );
     }
   }, [formData]);
 
@@ -288,7 +353,7 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         setSaveStatus("saved");
       }, 500);
     },
-    [updateField]
+    [updateField],
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -326,11 +391,15 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
           placeholder="Form title"
         />
         <span className="text-xs text-gray-400 shrink-0">
-          {saveStatus === "saved" ? "Saved" : saveStatus === "saving" ? "Saving…" : "Unsaved changes"}
+          {saveStatus === "saved"
+            ? "Saved"
+            : saveStatus === "saving"
+              ? "Saving…"
+              : "Unsaved changes"}
         </span>
         <Separator orientation="vertical" className="h-6" />
         <Button size="sm" variant="outline" asChild>
-          <a href={`/f/${formData.slug}`} target="_blank" className="flex items-center gap-1">
+          <a href={`/f/${formData.slug}`} target="_blank" rel="noreferrer" className="flex items-center gap-1">
             <Eye className="h-3 w-3" /> Preview
           </a>
         </Button>
@@ -357,7 +426,9 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Add fields */}
         <div className="w-52 shrink-0 border-r bg-gray-50 p-3 overflow-y-auto">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Add field</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+            Add field
+          </p>
           <div className="space-y-1">
             {FIELD_TYPES.map(({ type, label, icon: Icon }) => (
               <button

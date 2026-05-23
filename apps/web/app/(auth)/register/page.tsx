@@ -62,27 +62,54 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <Label htmlFor="name">Full name</Label>
-                <Input id="name" placeholder="Ada Lovelace" {...register("name")} className="mt-1" />
+                <Input
+                  id="name"
+                  placeholder="Ada Lovelace"
+                  {...register("name")}
+                  className="mt-1"
+                />
                 {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
               </div>
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@example.com" {...register("email")} className="mt-1" />
-                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  {...register("email")}
+                  className="mt-1"
+                />
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="Min 8 characters" {...register("password")} className="mt-1" />
-                {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Min 8 characters"
+                  {...register("password")}
+                  className="mt-1"
+                />
+                {errors.password && (
+                  <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+                )}
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" disabled={isSubmitting} className="w-full bg-violet-600 hover:bg-violet-700">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-violet-600 hover:bg-violet-700"
+              >
                 {isSubmitting ? "Creating account…" : "Create account"}
               </Button>
             </form>
             <p className="text-center text-sm text-gray-500 mt-4">
               Already have an account?{" "}
-              <Link href="/login" className="text-violet-600 hover:underline">Sign in</Link>
+              <Link href="/login" className="text-violet-600 hover:underline">
+                Sign in
+              </Link>
             </p>
           </CardContent>
         </Card>

@@ -16,10 +16,16 @@ async function getDashboardData(userId: string) {
   let totalViews = 0;
 
   for (const form of userForms.slice(0, 5)) {
-    const rResult = await db.select({ value: count() }).from(responses).where(eq(responses.formId, form.id));
+    const rResult = await db
+      .select({ value: count() })
+      .from(responses)
+      .where(eq(responses.formId, form.id));
     totalResponses += rResult[0]?.value ?? 0;
 
-    const vResult = await db.select({ value: count() }).from(formViews).where(eq(formViews.formId, form.id));
+    const vResult = await db
+      .select({ value: count() })
+      .from(formViews)
+      .where(eq(formViews.formId, form.id));
     totalViews += vResult[0]?.value ?? 0;
   }
 
@@ -30,7 +36,9 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const { userForms, totalForms, totalResponses, totalViews } = await getDashboardData(session.user.id!);
+  const { userForms, totalForms, totalResponses, totalViews } = await getDashboardData(
+    session.user.id!,
+  );
 
   const stats = [
     { label: "Total Forms", value: totalForms, icon: FileText },

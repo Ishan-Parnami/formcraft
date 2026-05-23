@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
-import { CheckCircle2, Zap, BarChart3, Palette, Share2, ArrowRight, Star } from "lucide-react";
+import { Zap, BarChart3, Palette, Share2, ArrowRight, Star } from "lucide-react";
 import { auth } from "~/auth";
 
 const features = [
@@ -29,9 +29,21 @@ const features = [
 ];
 
 const steps = [
-  { number: "01", title: "Create", description: "Pick a theme, add your fields, configure validations." },
-  { number: "02", title: "Share", description: "Publish and share your unique form URL with anyone." },
-  { number: "03", title: "Collect", description: "Watch responses roll in and export them as CSV." },
+  {
+    number: "01",
+    title: "Create",
+    description: "Pick a theme, add your fields, configure validations.",
+  },
+  {
+    number: "02",
+    title: "Share",
+    description: "Publish and share your unique form URL with anyone.",
+  },
+  {
+    number: "03",
+    title: "Collect",
+    description: "Watch responses roll in and export them as CSV.",
+  },
 ];
 
 const testimonials = [
@@ -62,23 +74,35 @@ export default async function LandingPage() {
       {/* Nav */}
       <nav className="border-b sticky top-0 bg-white/80 backdrop-blur z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-violet-600">FormForge</Link>
+          <Link href="/" className="text-xl font-bold text-violet-600">
+            FormForge
+          </Link>
           <div className="hidden md:flex items-center gap-6 text-sm">
-            <Link href="/pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
-            <Link href="/explore" className="text-gray-600 hover:text-gray-900">Explore</Link>
+            <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
+              Pricing
+            </Link>
+            <Link href="/explore" className="text-gray-600 hover:text-gray-900">
+              Explore
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             {session?.user ? (
               <Link href="/dashboard">
-                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Go to Dashboard →</Button>
+                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
+                  Go to Dashboard →
+                </Button>
               </Link>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm">Log in</Button>
+                  <Button variant="ghost" size="sm">
+                    Log in
+                  </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get started free</Button>
+                  <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
+                    Get started free
+                  </Button>
                 </Link>
               </>
             )}
@@ -88,14 +112,17 @@ export default async function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 py-24 text-center">
-        <Badge className="mb-6 bg-violet-50 text-violet-700 border-violet-200">Open beta — free forever</Badge>
+        <Badge className="mb-6 bg-violet-50 text-violet-700 border-violet-200">
+          Open beta — free forever
+        </Badge>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 mb-6">
-          Build beautiful forms<br />
+          Build beautiful forms
+          <br />
           <span className="text-violet-600">in minutes</span>
         </h1>
         <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
-          Drag-and-drop builder. 10 stunning themes. Analytics that actually make sense.
-          No design skills required.
+          Drag-and-drop builder. 10 stunning themes. Analytics that actually make sense. No design
+          skills required.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/register">
@@ -104,7 +131,9 @@ export default async function LandingPage() {
             </Button>
           </Link>
           <Link href="/explore">
-            <Button size="lg" variant="outline" className="px-8">See live examples</Button>
+            <Button size="lg" variant="outline" className="px-8">
+              See live examples
+            </Button>
           </Link>
         </div>
       </section>
@@ -156,7 +185,7 @@ export default async function LandingPage() {
                       <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-gray-700 mb-4 text-sm">"{t.body}"</p>
+                  <p className="text-gray-700 mb-4 text-sm">&ldquo;{t.body}&rdquo;</p>
                   <div>
                     <div className="font-semibold text-sm">{t.name}</div>
                     <div className="text-xs text-gray-500">{t.role}</div>

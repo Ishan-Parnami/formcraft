@@ -11,7 +11,7 @@ export const exploreRouter = router({
         limit: z.number().int().positive().max(50).default(12),
         category: z.string().optional(),
         search: z.string().optional(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const offset = (input.page - 1) * input.limit;

@@ -49,7 +49,7 @@ export function hashIp(ip: string): string {
 export function paginate<T>(
   items: T[],
   page: number,
-  limit: number
+  limit: number,
 ): { items: T[]; total: number; page: number; totalPages: number } {
   const total = items.length;
   const totalPages = Math.ceil(total / limit);

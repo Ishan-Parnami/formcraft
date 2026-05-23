@@ -62,7 +62,9 @@ export default function LoginPage() {
                   {...register("email")}
                   className="mt-1"
                 />
-                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
@@ -73,7 +75,9 @@ export default function LoginPage() {
                   {...register("password")}
                   className="mt-1"
                 />
-                {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
+                {errors.password && (
+                  <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+                )}
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button
@@ -86,7 +90,9 @@ export default function LoginPage() {
             </form>
             <p className="text-center text-sm text-gray-500 mt-4">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-violet-600 hover:underline">Sign up</Link>
+              <Link href="/register" className="text-violet-600 hover:underline">
+                Sign up
+              </Link>
             </p>
             <div className="mt-4 p-3 bg-blue-50 rounded-md text-xs text-blue-700">
               <strong>Demo:</strong> demo@formforge.dev / Demo@1234

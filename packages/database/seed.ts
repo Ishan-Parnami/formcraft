@@ -303,10 +303,27 @@ async function seed() {
   });
 
   // Seed 47 responses for form 1
-  const aliases = ["NeonSamurai", "SakuraBlade", "GundamPilot", "AttackTitan", "DragonSlayer", "LightYagami", "NarutoFan", "OnePieceLover", "FMABrother", "HunterHunter"];
+  const aliases = [
+    "NeonSamurai",
+    "SakuraBlade",
+    "GundamPilot",
+    "AttackTitan",
+    "DragonSlayer",
+    "LightYagami",
+    "NarutoFan",
+    "OnePieceLover",
+    "FMABrother",
+    "HunterHunter",
+  ];
   const eras = ["90s_classics", "2000s_peak", "2010s_golden", "2020s_now"];
   const genres = ["shonen", "seinen", "isekai", "mecha", "slice_of_life", "horror"];
-  const arcs = ["The Chimera Ant arc is peak fiction.", "Marineford will never be topped.", "Pain's invasion arc broke me.", "Chunin Exams is childhood.", "The Promised Neverland Season 1."];
+  const arcs = [
+    "The Chimera Ant arc is peak fiction.",
+    "Marineford will never be topped.",
+    "Pain's invasion arc broke me.",
+    "Chunin Exams is childhood.",
+    "The Promised Neverland Season 1.",
+  ];
 
   for (let i = 0; i < 47; i++) {
     const fieldMap: Record<string, unknown> = {};
@@ -349,7 +366,12 @@ async function seed() {
           { label: "Other", value: "other" },
         ],
       },
-      { type: "rating", label: "Rate your current IDE (1–5)", required: true, validations: { max: 5 } },
+      {
+        type: "rating",
+        label: "Rate your current IDE (1–5)",
+        required: true,
+        validations: { max: 5 },
+      },
       {
         type: "multi_select",
         label: "Tools you use daily",
@@ -369,7 +391,14 @@ async function seed() {
     ],
   });
 
-  const roles = ["Frontend Dev", "Backend Dev", "Full-Stack", "DevOps", "ML Engineer", "Staff Engineer"];
+  const roles = [
+    "Frontend Dev",
+    "Backend Dev",
+    "Full-Stack",
+    "DevOps",
+    "ML Engineer",
+    "Staff Engineer",
+  ];
   const langs = ["typescript", "python", "go", "rust", "java", "other"];
   const tools = ["vscode", "neovim", "copilot", "docker", "k8s", "linear", "notion"];
   const frustrations = [
@@ -425,12 +454,23 @@ async function seed() {
         ],
       },
       { type: "number", label: "Estimated MRR goal ($)", required: false, validations: { min: 0 } },
-      { type: "rating", label: "How convinced are you? (1–5)", required: true, validations: { max: 5 } },
+      {
+        type: "rating",
+        label: "How convinced are you? (1–5)",
+        required: true,
+        validations: { max: 5 },
+      },
       { type: "email", label: "Your email for follow-up", required: false },
     ],
   });
 
-  const startupNames = ["FormAI", "SlackKiller", "Linear for Designers", "Notion + Figma", "Zero-Click Analytics"];
+  const startupNames = [
+    "FormAI",
+    "SlackKiller",
+    "Linear for Designers",
+    "Notion + Figma",
+    "Zero-Click Analytics",
+  ];
   const problems = [
     "Most form builders are either too simple or too expensive for indie hackers. There is no middle ground.",
     "Analytics tools collect data but don't help you act on it. This solves the last mile problem.",
@@ -479,7 +519,12 @@ async function seed() {
           { label: "Does it matter?", value: "philosophical" },
         ],
       },
-      { type: "rating", label: "Rate Blade Runner 2049 (1–10)", required: true, validations: { max: 10 } },
+      {
+        type: "rating",
+        label: "Rate Blade Runner 2049 (1–10)",
+        required: true,
+        validations: { max: 10 },
+      },
       { type: "long_text", label: "Your favorite monologue or quote", required: false },
       { type: "email", label: "Email for the Voigt-Kampff results", required: false },
     ],
@@ -569,7 +614,13 @@ async function seed() {
 
   // ── 9. Seed form_views ─────────────────────────────────────────────────────
   console.log("  Seeding form views…");
-  const referrers = ["https://reddit.com/r/anime", "https://twitter.com", "https://github.com", "direct", "https://hn.algolia.com"];
+  const referrers = [
+    "https://reddit.com/r/anime",
+    "https://twitter.com",
+    "https://github.com",
+    "direct",
+    "https://hn.algolia.com",
+  ];
 
   async function seedViews(formId: string, count: number) {
     const batch = [];

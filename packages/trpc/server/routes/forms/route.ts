@@ -7,22 +7,20 @@ import bcrypt from "bcryptjs";
 import { publicProcedure, protectedProcedure, router } from "../../trpc";
 
 export const formsRouter = router({
-  create: protectedProcedure
-    .input(CreateFormSchema)
-    .mutation(async ({ ctx, input }) => {
-      const slug = generateUniqueSlug(input.title);
-      const [form] = await db
-        .insert(forms)
-        .values({
-          slug,
-          title: input.title,
-          description: input.description,
-          visibility: input.visibility,
-          userId: ctx.user.id,
-        })
-        .returning();
-      return form;
-    }),
+  create: protectedProcedure.input(CreateFormSchema).mutation(async ({ ctx, input }) => {
+    const slug = generateUniqueSlug(input.title);
+    const [form] = await db
+      .insert(forms)
+      .values({
+        slug,
+        title: input.title,
+        description: input.description,
+        visibility: input.visibility,
+        userId: ctx.user.id,
+      })
+      .returning();
+    return form;
+  }),
 
   list: protectedProcedure.query(async ({ ctx }) => {
     return db.select().from(forms).where(eq(forms.userId, ctx.user.id));
@@ -37,27 +35,19 @@ export const formsRouter = router({
       // Unpublished forms are only visible to owners
       if (!form.isPublished && (!ctx.user || ctx.user.id !== form.userId)) return null;
 
-      const formFields = await db
-        .select()
-        .from(fields)
-        .where(eq(fields.formId, form.id));
+      const formFields = await db.select().from(fields).where(eq(fields.formId, form.id));
 
       return { ...form, fields: formFields };
     }),
 
-  getBySlug: publicProcedure
-    .input(z.object({ slug: z.string() }))
-    .query(async ({ input }) => {
-      const [form] = await db.select().from(forms).where(eq(forms.slug, input.slug));
-      if (!form || !form.isPublished) return null;
+  getBySlug: publicProcedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+    const [form] = await db.select().from(forms).where(eq(forms.slug, input.slug));
+    if (!form || !form.isPublished) return null;
 
-      const formFields = await db
-        .select()
-        .from(fields)
-        .where(eq(fields.formId, form.id));
+    const formFields = await db.select().from(fields).where(eq(fields.formId, form.id));
 
-      return { ...form, fields: formFields };
-    }),
+    return { ...form, fields: formFields };
+  }),
 
   update: protectedProcedure
     .input(z.object({ formId: z.string().uuid() }).merge(UpdateFormSchema))
@@ -96,9 +86,7 @@ export const formsRouter = router({
   delete: protectedProcedure
     .input(z.object({ formId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      await db
-        .delete(forms)
-        .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
+      await db.delete(forms).where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
       return { success: true };
     }),
 
@@ -111,10 +99,7 @@ export const formsRouter = router({
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
       if (!original) throw new Error("Form not found");
 
-      const originalFields = await db
-        .select()
-        .from(fields)
-        .where(eq(fields.formId, original.id));
+      const originalFields = await db.select().from(fields).where(eq(fields.formId, original.id));
 
       const newSlug = generateUniqueSlug(`${original.title} copy`);
       const cloneResult = await db
@@ -145,7 +130,7 @@ export const formsRouter = router({
             options: f.options ?? undefined,
             validations: f.validations ?? undefined,
             conditionalLogic: f.conditionalLogic ?? undefined,
-          }))
+          })),
         );
       }
 
@@ -153,7 +138,16 @@ export const formsRouter = router({
     }),
 
   updateSlug: protectedProcedure
-    .input(z.object({ formId: z.string().uuid(), slug: z.string().min(3).max(100).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only") }))
+    .input(
+      z.object({
+        formId: z.string().uuid(),
+        slug: z
+          .string()
+          .min(3)
+          .max(100)
+          .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const [existing] = await db
         .select({ id: forms.id })
@@ -180,8 +174,14 @@ export const formsRouter = router({
         settingsPatch = { requirePassword: true, passwordHash: hash };
       }
 
-      const [current] = await db.select({ settings: forms.settings }).from(forms).where(eq(forms.id, input.formId));
-      const merged = { ...(current?.settings as Record<string, unknown> ?? {}), ...settingsPatch };
+      const [current] = await db
+        .select({ settings: forms.settings })
+        .from(forms)
+        .where(eq(forms.id, input.formId));
+      const merged = {
+        ...((current?.settings as Record<string, unknown>) ?? {}),
+        ...settingsPatch,
+      };
 
       const [form] = await db
         .update(forms)
@@ -194,7 +194,10 @@ export const formsRouter = router({
   verifyFormPassword: publicProcedure
     .input(z.object({ formId: z.string().uuid(), password: z.string() }))
     .mutation(async ({ input }) => {
-      const [form] = await db.select({ settings: forms.settings }).from(forms).where(eq(forms.id, input.formId));
+      const [form] = await db
+        .select({ settings: forms.settings })
+        .from(forms)
+        .where(eq(forms.id, input.formId));
       const settings = (form?.settings ?? {}) as Record<string, unknown>;
       if (!settings.requirePassword) return { valid: true };
       const hash = settings.passwordHash as string | undefined;
@@ -203,9 +206,7 @@ export const formsRouter = router({
       return { valid };
     }),
 
-  generateSlug: publicProcedure
-    .input(z.object({ title: z.string() }))
-    .query(({ input }) => {
-      return { slug: generateUniqueSlug(input.title) };
-    }),
+  generateSlug: publicProcedure.input(z.object({ title: z.string() })).query(({ input }) => {
+    return { slug: generateUniqueSlug(input.title) };
+  }),
 });

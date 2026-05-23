@@ -7,7 +7,7 @@ import { generateOpenApiDocument, createOpenApiExpressMiddleware } from "trpc-to
 import { apiReference } from "@scalar/express-api-reference";
 
 import { serverRouter, createContext } from "@formforge/trpc/server";
-import type { SessionUser, CreateContextOptions } from "@formforge/trpc/server";
+import type { SessionUser } from "@formforge/trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 
 import { env } from "./env";
@@ -17,7 +17,7 @@ export const app = express();
 app.use(
   cors({
     origin: env.NODE_ENV === "production" ? false : "*",
-  })
+  }),
 );
 
 app.use(express.json());
@@ -28,7 +28,11 @@ app.use((req, _res, next) => {
   if (auth?.startsWith("Bearer ") && env.NEXTAUTH_SECRET) {
     try {
       const token = auth.slice(7);
-      const decoded = jwt.verify(token, env.NEXTAUTH_SECRET) as { sub?: string; email?: string; name?: string };
+      const decoded = jwt.verify(token, env.NEXTAUTH_SECRET) as {
+        sub?: string;
+        email?: string;
+        name?: string;
+      };
       (req as typeof req & { user?: SessionUser }).user = {
         id: decoded.sub ?? "",
         email: decoded.email ?? "",
@@ -77,7 +81,7 @@ app.use(
   createOpenApiExpressMiddleware({
     router: serverRouter,
     createContext: adaptContext,
-  })
+  }),
 );
 
 app.use(
@@ -85,7 +89,7 @@ app.use(
   trpcExpress.createExpressMiddleware({
     router: serverRouter,
     createContext: adaptContext,
-  })
+  }),
 );
 
 export default app;

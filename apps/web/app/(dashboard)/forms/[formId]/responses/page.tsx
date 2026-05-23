@@ -7,7 +7,15 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
-import { ArrowLeft, Download, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare,
+} from "lucide-react";
 import type { RouterOutputs } from "@formforge/trpc/client";
 
 type Response = RouterOutputs["responses"]["list"]["responses"][number];
@@ -43,14 +51,20 @@ function ResponseRow({
           {response.createdAt ? new Date(response.createdAt).toLocaleString("en-US") : ""}
         </span>
         {response.completionTime && (
-          <Badge variant="outline" className="text-xs">{response.completionTime}s</Badge>
+          <Badge variant="outline" className="text-xs">
+            {response.completionTime}s
+          </Badge>
         )}
         {response.respondentEmail ? (
           <span className="text-xs text-gray-500 hidden sm:inline">{response.respondentEmail}</span>
         ) : (
           <span className="text-xs text-gray-300 hidden sm:inline">anonymous</span>
         )}
-        {expanded ? <ChevronUp className="h-3 w-3 text-gray-400" /> : <ChevronDown className="h-3 w-3 text-gray-400" />}
+        {expanded ? (
+          <ChevronUp className="h-3 w-3 text-gray-400" />
+        ) : (
+          <ChevronDown className="h-3 w-3 text-gray-400" />
+        )}
       </button>
 
       {expanded && (
@@ -103,7 +117,9 @@ export default function ResponsesPage({ params }: { params: Promise<{ formId: st
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Link href={`/forms/${formId}`}>
-          <Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
+          </Button>
         </Link>
         <h1 className="text-2xl font-bold flex-1">{formData?.title ?? "…"} — Responses</h1>
         <Button size="sm" variant="outline" onClick={downloadCsv} className="gap-1">
@@ -118,7 +134,10 @@ export default function ResponsesPage({ params }: { params: Promise<{ formId: st
           <Input
             type="date"
             value={dateFrom}
-            onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setDateFrom(e.target.value);
+              setPage(1);
+            }}
             className="h-8 text-xs w-36"
           />
         </div>
@@ -127,7 +146,10 @@ export default function ResponsesPage({ params }: { params: Promise<{ formId: st
           <Input
             type="date"
             value={dateTo}
-            onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setDateTo(e.target.value);
+              setPage(1);
+            }}
             className="h-8 text-xs w-36"
           />
         </div>
@@ -136,7 +158,11 @@ export default function ResponsesPage({ params }: { params: Promise<{ formId: st
             size="sm"
             variant="ghost"
             className="h-8 text-xs"
-            onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
+            onClick={() => {
+              setDateFrom("");
+              setDateTo("");
+              setPage(1);
+            }}
           >
             Clear
           </Button>
@@ -168,7 +194,9 @@ export default function ResponsesPage({ params }: { params: Promise<{ formId: st
           <CardContent className="py-20 text-center">
             <MessageSquare className="h-10 w-10 text-gray-200 mx-auto mb-3" />
             <p className="text-gray-500">No responses yet.</p>
-            <p className="text-sm text-gray-400 mt-1">Share your form to start collecting responses.</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Share your form to start collecting responses.
+            </p>
           </CardContent>
         </Card>
       ) : (

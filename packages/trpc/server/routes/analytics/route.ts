@@ -25,8 +25,7 @@ export const analyticsRouter = router({
         .where(eq(formViews.formId, input.formId));
       const totalViews = totalViewsResult[0]?.totalViews ?? 0;
 
-      const completionRate =
-        totalViews > 0 ? Math.round((totalResponses / totalViews) * 100) : 0;
+      const completionRate = totalViews > 0 ? Math.round((totalResponses / totalViews) * 100) : 0;
 
       const avgTimeResult = await db
         .select({ avg: avg(responses.completionTime) })
@@ -46,8 +45,8 @@ export const analyticsRouter = router({
         .where(
           and(
             eq(responses.formId, input.formId),
-            sql`${responses.createdAt} >= now() - interval '30 days'`
-          )
+            sql`${responses.createdAt} >= now() - interval '30 days'`,
+          ),
         )
         .groupBy(sql`date_trunc('day', ${responses.createdAt})`)
         .orderBy(sql`date_trunc('day', ${responses.createdAt})`);
@@ -90,10 +89,7 @@ export const analyticsRouter = router({
         .where(eq(fields.formId, input.formId))
         .orderBy(fields.order);
 
-      const data = await db
-        .select()
-        .from(responses)
-        .where(eq(responses.formId, input.formId));
+      const data = await db.select().from(responses).where(eq(responses.formId, input.formId));
 
       return formFields.map((field) => {
         const rawAnswers = data
@@ -112,7 +108,10 @@ export const analyticsRouter = router({
 
         if (field.type === "rating") {
           const nums = rawAnswers.map(Number).filter((n) => !isNaN(n));
-          avgRating = nums.length > 0 ? Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 10) / 10 : 0;
+          avgRating =
+            nums.length > 0
+              ? Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 10) / 10
+              : 0;
           const opts = (field.validations as { max?: number } | null)?.max ?? 5;
           distribution = {};
           for (let i = 1; i <= opts; i++) distribution[String(i)] = 0;
@@ -134,7 +133,10 @@ export const analyticsRouter = router({
           }
         } else if (field.type === "short_text" || field.type === "long_text") {
           const lengths = rawAnswers.map((v) => String(v).length);
-          avgLength = lengths.length > 0 ? Math.round(lengths.reduce((a, b) => a + b, 0) / lengths.length) : 0;
+          avgLength =
+            lengths.length > 0
+              ? Math.round(lengths.reduce((a, b) => a + b, 0) / lengths.length)
+              : 0;
         } else if (field.type === "checkbox") {
           trueCount = rawAnswers.filter(Boolean).length;
           falseCount = rawAnswers.length - trueCount;

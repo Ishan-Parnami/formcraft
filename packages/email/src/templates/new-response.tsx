@@ -15,7 +15,15 @@ export function NewResponseEmail({
   dashboardUrl,
 }: NewResponseEmailProps) {
   return (
-    <div style={{ fontFamily: "Inter, sans-serif", maxWidth: 560, margin: "0 auto", padding: "32px 24px", backgroundColor: "#ffffff" }}>
+    <div
+      style={{
+        fontFamily: "Inter, sans-serif",
+        maxWidth: 560,
+        margin: "0 auto",
+        padding: "32px 24px",
+        backgroundColor: "#ffffff",
+      }}
+    >
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: 18 }}>FormForge</span>
@@ -30,14 +38,32 @@ export function NewResponseEmail({
 
       {/* Key answers */}
       {keyAnswers.length > 0 && (
-        <div style={{ backgroundColor: "#f9fafb", borderRadius: 8, padding: "16px 20px", marginBottom: 24 }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px" }}>
+        <div
+          style={{
+            backgroundColor: "#f9fafb",
+            borderRadius: 8,
+            padding: "16px 20px",
+            marginBottom: 24,
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#9ca3af",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              margin: "0 0 12px",
+            }}
+          >
             Response summary
           </p>
           {keyAnswers.map(({ label, value }) => (
             <div key={label} style={{ marginBottom: 8 }}>
               <span style={{ fontSize: 12, color: "#6b7280" }}>{label}</span>
-              <p style={{ fontSize: 14, color: "#111827", margin: "2px 0 0", fontWeight: 500 }}>{value || "—"}</p>
+              <p style={{ fontSize: 14, color: "#111827", margin: "2px 0 0", fontWeight: 500 }}>
+                {value || "—"}
+              </p>
             </div>
           ))}
         </div>
@@ -67,8 +93,11 @@ export function NewResponseEmail({
       {/* Footer */}
       <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "32px 0 16px" }} />
       <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>
-        Sent by <a href="https://formforge.dev" style={{ color: "#7c3aed", textDecoration: "none" }}>FormForge</a>.
-        You&apos;re receiving this because you own this form.
+        Sent by{" "}
+        <a href="https://formforge.dev" style={{ color: "#7c3aed", textDecoration: "none" }}>
+          FormForge
+        </a>
+        . You&apos;re receiving this because you own this form.
       </p>
     </div>
   );

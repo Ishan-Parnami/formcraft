@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
 import db, { forms, fields } from "@formforge/db";
-import { eq, and } from "@formforge/db";
-import type { SelectField } from "@formforge/db";
+import { eq } from "@formforge/db";
 import PublicFormClient from "./PublicFormClient";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +32,8 @@ export default async function PublicFormPage({ params }: { params: Promise<{ slu
   const { slug } = await params;
   const form = await getPublicForm(slug);
 
-  if (!form) return <Unavailable message="This form doesn't exist or is no longer accepting responses." />;
+  if (!form)
+    return <Unavailable message="This form doesn't exist or is no longer accepting responses." />;
 
   const settings = (form.settings ?? {}) as Record<string, unknown>;
 
@@ -43,13 +42,10 @@ export default async function PublicFormPage({ params }: { params: Promise<{ slu
   }
 
   // Strip passwordHash before sending to client
-  const { passwordHash: _, ...safeSettings } = settings as Record<string, unknown> & { passwordHash?: unknown };
+  const { passwordHash: _, ...safeSettings } = settings as Record<string, unknown> & {
+    passwordHash?: unknown;
+  };
   const theme = (form.theme ?? {}) as Record<string, unknown>;
 
-  return (
-    <PublicFormClient
-      form={{ ...form, settings: safeSettings }}
-      theme={theme}
-    />
-  );
+  return <PublicFormClient form={{ ...form, settings: safeSettings }} theme={theme} />;
 }

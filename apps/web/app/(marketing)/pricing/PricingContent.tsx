@@ -5,7 +5,10 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
+import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
 import { CheckCircle2 } from "lucide-react";
+
+type Feature = { label: string; comingSoon?: boolean };
 
 const plans = [
   {
@@ -14,15 +17,13 @@ const plans = [
     annualPrice: 0,
     description: "Perfect for personal projects and getting started.",
     features: [
-      "3 forms",
-      "100 responses/month",
-      "Basic themes",
-      "Public & unlisted forms",
-      "CSV export",
-    ],
-    cta: "Get started free",
-    href: "/register",
+      { label: "3 forms" },
+      { label: "100 responses/month", comingSoon: true },
+      { label: "Public & unlisted forms" },
+      { label: "CSV export" },
+    ] satisfies Feature[],
     highlight: false,
+    cta: "free",
   },
   {
     name: "Pro",
@@ -30,18 +31,17 @@ const plans = [
     annualPrice: 9,
     description: "For creators and small teams who need more power.",
     features: [
-      "Unlimited forms",
-      "10,000 responses/month",
-      "All 10 premium themes",
-      "Advanced analytics",
-      "CSV export",
-      "Custom success pages",
-      "Conditional logic",
-      "Password-protected forms",
-    ],
-    cta: "Start Pro trial",
-    href: "/register",
+      { label: "Unlimited forms" },
+      { label: "10,000 responses/month", comingSoon: true },
+      { label: "Advanced analytics" },
+      { label: "CSV export" },
+      { label: "Custom success pages" },
+      { label: "Password-protected forms" },
+      { label: "All 10 premium themes", comingSoon: true },
+      { label: "Conditional logic", comingSoon: true },
+    ] satisfies Feature[],
     highlight: true,
+    cta: "pro",
   },
   {
     name: "Business",
@@ -49,20 +49,59 @@ const plans = [
     annualPrice: 29,
     description: "For teams with enterprise-grade needs.",
     features: [
-      "Everything in Pro",
-      "Team workspace",
-      "API access",
-      "Priority support",
-      "Custom domain",
-      "White-label forms",
-      "Advanced integrations",
-      "SLA guarantee",
-    ],
-    cta: "Contact sales",
-    href: "/register",
+      { label: "Everything in Pro" },
+      { label: "API access" },
+      { label: "Priority support" },
+      { label: "SLA guarantee" },
+      { label: "Team workspace", comingSoon: true },
+      { label: "Custom domain", comingSoon: true },
+      { label: "White-label forms", comingSoon: true },
+      { label: "Advanced integrations", comingSoon: true },
+    ] satisfies Feature[],
     highlight: false,
+    cta: "business",
   },
-];
+] as const;
+
+function PlanCTA({ cta, isLoggedIn }: { cta: string; isLoggedIn: boolean }) {
+  if (cta === "free") {
+    return (
+      <Link href={isLoggedIn ? "/dashboard" : "/register"}>
+        <Button className="w-full mb-6" variant="outline">
+          {isLoggedIn ? "Go to Dashboard" : "Get started free"}
+        </Button>
+      </Link>
+    );
+  }
+
+  if (cta === "pro") {
+    return (
+      <div className="mb-6 space-y-2">
+        <Button
+          className="w-full cursor-not-allowed opacity-60 bg-violet-600"
+          disabled
+        >
+          Coming Soon
+        </Button>
+        <p className="text-center text-xs text-gray-500">
+          Pro plan launching soon —{" "}
+          <Link href="/waitlist" className="text-violet-600 hover:underline font-medium">
+            join the waitlist
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
+  // business
+  return (
+    <Link href="/contact">
+      <Button className="w-full mb-6" variant="outline">
+        Contact Sales
+      </Button>
+    </Link>
+  );
+}
 
 export default function PricingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [annual, setAnnual] = useState(false);
@@ -147,19 +186,17 @@ export default function PricingContent({ isLoggedIn }: { isLoggedIn: boolean }) 
                 <p className="text-sm text-gray-500 mt-2">{plan.description}</p>
               </CardHeader>
               <CardContent>
-                <Link href={plan.href}>
-                  <Button
-                    className={`w-full mb-6 ${plan.highlight ? "bg-violet-600 hover:bg-violet-700" : ""}`}
-                    variant={plan.highlight ? "default" : "outline"}
-                  >
-                    {plan.cta}
-                  </Button>
-                </Link>
+                <PlanCTA cta={plan.cta} isLoggedIn={isLoggedIn} />
                 <ul className="space-y-2">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm">
+                    <li key={f.label} className="flex items-center gap-2 text-sm">
                       <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-                      {f}
+                      <span>{f.label}</span>
+                      {f.comingSoon && (
+                        <span className="ml-auto">
+                          <ComingSoonBadge />
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>

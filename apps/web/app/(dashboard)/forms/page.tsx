@@ -36,41 +36,43 @@ export default async function FormsPage() {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {userForms.map((form) => (
-            <Card key={form.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-sm line-clamp-1">{form.title}</h3>
-                  <Badge
-                    className={`text-xs shrink-0 ml-2 ${form.isPublished ? "bg-green-100 text-green-700 border-green-200" : "bg-gray-100 text-gray-600"}`}
-                    variant="outline"
-                  >
-                    {form.isPublished ? "Published" : "Draft"}
-                  </Badge>
-                </div>
-                {form.description && (
-                  <p className="text-xs text-gray-500 line-clamp-2 mb-3">{form.description}</p>
-                )}
-                <div className="flex gap-2 mt-3">
-                  <Link href={`/forms/${form.id}/edit`}>
-                    <Button size="sm" variant="outline" className="text-xs h-7 px-2">
-                      <Edit className="h-3 w-3 mr-1" /> Edit
-                    </Button>
-                  </Link>
-                  <Link href={`/forms/${form.id}/responses`}>
-                    <Button size="sm" variant="outline" className="text-xs h-7 px-2">
-                      <BarChart3 className="h-3 w-3 mr-1" /> Responses
-                    </Button>
-                  </Link>
-                  {form.isPublished && (
-                    <Link href={`/f/${form.slug}`} target="_blank">
+            <Link key={form.id} href={`/forms/${form.id}`}>
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-semibold text-sm line-clamp-1">{form.title}</h3>
+                    <Badge
+                      className={`text-xs shrink-0 ml-2 ${form.isPublished ? "bg-green-100 text-green-700 border-green-200" : "bg-gray-100 text-gray-600"}`}
+                      variant="outline"
+                    >
+                      {form.isPublished ? "Published" : "Draft"}
+                    </Badge>
+                  </div>
+                  {form.description && (
+                    <p className="text-xs text-gray-500 line-clamp-2 mb-3">{form.description}</p>
+                  )}
+                  <div className="flex gap-2 mt-3">
+                    <Link href={`/forms/${form.id}/edit`}>
                       <Button size="sm" variant="outline" className="text-xs h-7 px-2">
-                        <Eye className="h-3 w-3 mr-1" /> View
+                        <Edit className="h-3 w-3 mr-1" /> Edit
                       </Button>
                     </Link>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                    <Link href={`/forms/${form.id}/responses`}>
+                      <Button size="sm" variant="outline" className="text-xs h-7 px-2">
+                        <BarChart3 className="h-3 w-3 mr-1" /> Responses
+                      </Button>
+                    </Link>
+                    {form.isPublished && (
+                      <Link href={`/f/${form.slug}`} target="_blank">
+                        <Button size="sm" variant="outline" className="text-xs h-7 px-2">
+                          <Eye className="h-3 w-3 mr-1" /> View
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

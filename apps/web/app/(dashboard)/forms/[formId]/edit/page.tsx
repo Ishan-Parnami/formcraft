@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import { trpc } from "~/trpc/client";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -25,7 +26,10 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "@formforge/trpc/client";
 import type { CreateFieldInput, UpdateFieldInput, FieldValidations, FieldOption } from "@formforge/schemas/form";
+import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
+import { Tooltip, TooltipTrigger, TooltipContent } from "~/components/ui/tooltip";
 import {
+  ArrowLeft,
   GripVertical,
   Plus,
   Trash2,
@@ -41,8 +45,8 @@ import {
   Star,
   Calendar,
   List,
+  Palette,
 } from "lucide-react";
-
 type TRPCField = NonNullable<RouterOutputs["forms"]["getById"]>["fields"][number];
 type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 
@@ -332,6 +336,14 @@ function FieldConfig({
           />
         </div>
       )}
+
+      {/* Conditional Logic — coming soon */}
+      <div className="pt-2 border-t">
+        <div className="flex items-center justify-between py-2">
+          <span className="text-sm text-gray-400">Conditional Logic</span>
+          <ComingSoonBadge />
+        </div>
+      </div>
     </div>
   );
 }
@@ -405,6 +417,12 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
     <div className="h-full flex flex-col">
       {/* Top bar */}
       <div className="h-14 border-b bg-white flex items-center px-4 gap-2 shrink-0 overflow-x-auto">
+        <Link href={`/forms/${formId}`}>
+          <Button size="sm" variant="ghost" className="gap-1 shrink-0">
+            <ArrowLeft className="h-3.5 w-3.5" /> Back
+          </Button>
+        </Link>
+        {/* <Separator orientation="vertical" className="h-6 shrink-0" /> */}
         <input
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
@@ -414,6 +432,17 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         <span className={`text-xs shrink-0 ${SAVE_STATUS_CLASSES[saveStatus]}`}>
           {SAVE_STATUS_LABELS[saveStatus]}
         </span>
+        <Separator orientation="vertical" className="h-6" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="shrink-0">
+              <Button size="sm" variant="ghost" disabled className="gap-1 cursor-not-allowed opacity-60 pointer-events-none">
+                <Palette className="h-3 w-3" /> Theme
+              </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>Coming soon</TooltipContent>
+        </Tooltip>
         <Separator orientation="vertical" className="h-6" />
         <Button
           size="sm"

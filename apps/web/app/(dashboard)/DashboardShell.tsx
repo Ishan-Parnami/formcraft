@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, FileText, Settings, LogOut, Menu, X, Users } from "lucide-react";
+import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
 
 const navLinks = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -45,6 +46,14 @@ function SidebarContent({
             </div>
           </Link>
         ))}
+        {/* Team — coming soon */}
+        <div className="flex items-center justify-between px-3 py-2 rounded-md text-sm text-gray-400 cursor-not-allowed select-none">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 shrink-0" />
+            Team
+          </div>
+          <ComingSoonBadge />
+        </div>
       </nav>
 
       <div className="p-3 border-t shrink-0">
@@ -76,7 +85,7 @@ export default function DashboardShell({
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 shrink-0 bg-white border-r flex-col">
+      <aside className="hidden md:flex w-60 shrink-0 bg-white border-r flex-col h-screen sticky top-0">
         <SidebarContent userName={userName} signOutAction={signOutAction} />
       </aside>
 

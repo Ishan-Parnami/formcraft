@@ -24,7 +24,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "@formforge/trpc/client";
-import type { CreateFieldInput } from "@formforge/schemas/form";
+import type { CreateFieldInput, UpdateFieldInput, FieldValidations, FieldOption } from "@formforge/schemas/form";
 import {
   GripVertical,
   Plus,
@@ -43,8 +43,8 @@ import {
   List,
 } from "lucide-react";
 
-// Use tRPC output type so dates are serialized strings, matching what tRPC sends over the wire
 type TRPCField = NonNullable<RouterOutputs["forms"]["getById"]>["fields"][number];
+type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 
 const FIELD_TYPES = [
   { type: "short_text", label: "Short Text", icon: Type },
@@ -57,6 +57,55 @@ const FIELD_TYPES = [
   { type: "rating", label: "Rating", icon: Star },
   { type: "date", label: "Date", icon: Calendar },
 ];
+
+const SAVE_STATUS_CLASSES: Record<SaveStatus, string> = {
+  saved: "text-gray-400",
+  saving: "text-blue-500",
+  unsaved: "text-amber-500",
+  error: "text-red-500",
+};
+
+const SAVE_STATUS_LABELS: Record<SaveStatus, string> = {
+  saved: "Saved",
+  saving: "Saving…",
+  unsaved: "Unsaved changes",
+  error: "Save failed",
+};
+
+// Per-key debounced auto-save — each key (title, field:<id>) has its own timer
+// so rapid edits to different things never cancel each other.
+function useAutoSave() {
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+  const timers = useRef(new Map<string, NodeJS.Timeout>());
+  const inFlight = useRef(0);
+
+  const schedule = useCallback((key: string, fn: () => Promise<unknown>) => {
+    setSaveStatus("unsaved");
+    const prev = timers.current.get(key);
+    if (prev) clearTimeout(prev);
+    timers.current.set(
+      key,
+      setTimeout(async () => {
+        timers.current.delete(key);
+        inFlight.current++;
+        setSaveStatus("saving");
+        try {
+          await fn();
+        } catch {
+          setSaveStatus("error");
+        } finally {
+          inFlight.current--;
+          // Only move to "saved" if there was no error (error state persists)
+          if (inFlight.current === 0) {
+            setSaveStatus((prev) => (prev === "saving" ? "saved" : prev));
+          }
+        }
+      }, 500),
+    );
+  }, []);
+
+  return { saveStatus, schedule };
+}
 
 function SortableField({
   field,
@@ -72,12 +121,11 @@ function SortableField({
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: field.id,
   });
-  const style = { transform: CSS.Transform.toString(transform), transition };
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
       onClick={onSelect}
       className={`group flex items-center gap-2 p-3 rounded-lg border bg-white cursor-pointer transition-all ${
         isSelected ? "border-violet-500 shadow-sm" : "border-gray-200 hover:border-gray-300"
@@ -107,10 +155,32 @@ function SortableField({
           e.stopPropagation();
           onDelete();
         }}
-        className="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="text-gray-300 hover:text-red-400 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
       >
         <Trash2 className="h-4 w-4" />
       </button>
+    </div>
+  );
+}
+
+function NumberInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number | "";
+  onChange: (v: number | undefined) => void;
+}) {
+  return (
+    <div>
+      <Label className="text-xs">{label}</Label>
+      <Input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value) || undefined)}
+        className="mt-1 text-sm"
+      />
     </div>
   );
 }
@@ -120,10 +190,10 @@ function FieldConfig({
   onUpdate,
 }: {
   field: TRPCField;
-  onUpdate: (data: Partial<TRPCField>) => void;
+  onUpdate: (data: UpdateFieldInput) => void;
 }) {
-  const validations = (field.validations ?? {}) as Record<string, unknown>;
-  const options = (field.options ?? []) as Array<{ label: string; value: string }>;
+  const validations = (field.validations ?? {}) as FieldValidations;
+  const options = (field.options ?? []) as FieldOption[];
 
   return (
     <div className="space-y-4">
@@ -166,63 +236,31 @@ function FieldConfig({
 
       {["short_text", "long_text"].includes(field.type) && (
         <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label className="text-xs">Min length</Label>
-            <Input
-              type="number"
-              value={(validations.minLength as number) ?? ""}
-              onChange={(e) =>
-                onUpdate({
-                  validations: { ...validations, minLength: parseInt(e.target.value) || undefined },
-                })
-              }
-              className="mt-1 text-sm"
-            />
-          </div>
-          <div>
-            <Label className="text-xs">Max length</Label>
-            <Input
-              type="number"
-              value={(validations.maxLength as number) ?? ""}
-              onChange={(e) =>
-                onUpdate({
-                  validations: { ...validations, maxLength: parseInt(e.target.value) || undefined },
-                })
-              }
-              className="mt-1 text-sm"
-            />
-          </div>
+          <NumberInput
+            label="Min length"
+            value={(validations.minLength as number) ?? ""}
+            onChange={(v) => onUpdate({ validations: { ...validations, minLength: v } })}
+          />
+          <NumberInput
+            label="Max length"
+            value={(validations.maxLength as number) ?? ""}
+            onChange={(v) => onUpdate({ validations: { ...validations, maxLength: v } })}
+          />
         </div>
       )}
 
       {field.type === "number" && (
         <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label className="text-xs">Min value</Label>
-            <Input
-              type="number"
-              value={(validations.min as number) ?? ""}
-              onChange={(e) =>
-                onUpdate({
-                  validations: { ...validations, min: parseInt(e.target.value) || undefined },
-                })
-              }
-              className="mt-1 text-sm"
-            />
-          </div>
-          <div>
-            <Label className="text-xs">Max value</Label>
-            <Input
-              type="number"
-              value={(validations.max as number) ?? ""}
-              onChange={(e) =>
-                onUpdate({
-                  validations: { ...validations, max: parseInt(e.target.value) || undefined },
-                })
-              }
-              className="mt-1 text-sm"
-            />
-          </div>
+          <NumberInput
+            label="Min value"
+            value={(validations.min as number) ?? ""}
+            onChange={(v) => onUpdate({ validations: { ...validations, min: v } })}
+          />
+          <NumberInput
+            label="Max value"
+            value={(validations.max as number) ?? ""}
+            onChange={(v) => onUpdate({ validations: { ...validations, max: v } })}
+          />
         </div>
       )}
 
@@ -234,13 +272,17 @@ function FieldConfig({
               size="sm"
               variant="outline"
               className="h-7 text-xs"
-              onClick={() => {
-                const newOption = {
-                  label: `Option ${options.length + 1}`,
-                  value: `option_${options.length + 1}`,
-                };
-                onUpdate({ options: [...options, newOption] });
-              }}
+              onClick={() =>
+                onUpdate({
+                  options: [
+                    ...options,
+                    {
+                      label: `Option ${options.length + 1}`,
+                      value: `option_${options.length + 1}`,
+                    },
+                  ],
+                })
+              }
             >
               <Plus className="h-3 w-3 mr-1" /> Add
             </Button>
@@ -250,12 +292,14 @@ function FieldConfig({
               <Input
                 value={opt.label}
                 onChange={(e) => {
-                  const updated = [...options];
-                  updated[i] = {
-                    ...opt,
-                    label: e.target.value,
-                    value: e.target.value.toLowerCase().replace(/\s+/g, "_"),
-                  };
+                  const updated = options.map((o, j) =>
+                    j === i
+                      ? {
+                          label: e.target.value,
+                          value: e.target.value.toLowerCase().replace(/\s+/g, "_"),
+                        }
+                      : o,
+                  );
                   onUpdate({ options: updated });
                 }}
                 className="text-sm"
@@ -295,6 +339,7 @@ function FieldConfig({
 export default function FormBuilderPage({ params }: { params: Promise<{ formId: string }> }) {
   const { formId } = use(params);
   const utils = trpc.useUtils();
+  const { saveStatus, schedule } = useAutoSave();
 
   const { data: formData, isLoading } = trpc.forms.getById.useQuery({ formId });
   const updateForm = trpc.forms.update.useMutation();
@@ -316,15 +361,12 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
   const [title, setTitle] = useState("");
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [localFields, setLocalFields] = useState<TRPCField[]>([]);
-  const saveTimer = useRef<NodeJS.Timeout | null>(null);
-  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
+  const [mobilePanel, setMobilePanel] = useState<"add" | "fields" | "config">("fields");
 
   useEffect(() => {
     if (formData) {
       setTitle(formData.title);
-      setLocalFields(
-        (formData.fields ?? []).sort((a: TRPCField, b: TRPCField) => a.order - b.order),
-      );
+      setLocalFields([...formData.fields].sort((a, b) => a.order - b.order));
     }
   }, [formData]);
 
@@ -332,76 +374,61 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    setSaveStatus("unsaved");
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(async () => {
-      setSaveStatus("saving");
-      await updateForm.mutateAsync({ formId, title: newTitle });
-      setSaveStatus("saved");
-    }, 500);
+    schedule("title", () => updateForm.mutateAsync({ formId, title: newTitle }));
   };
 
   const handleFieldUpdate = useCallback(
-    (fieldId: string, data: Partial<TRPCField>) => {
+    (fieldId: string, data: UpdateFieldInput) => {
       setLocalFields((prev) => prev.map((f) => (f.id === fieldId ? { ...f, ...data } : f)));
-      setSaveStatus("unsaved");
-      if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(async () => {
-        setSaveStatus("saving");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await updateField.mutateAsync({ fieldId, ...(data as any) });
-        setSaveStatus("saved");
-      }, 500);
+      schedule(`field:${fieldId}`, () => updateField.mutateAsync({ fieldId, ...data }));
     },
-    [updateField],
+    [updateField, schedule],
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
-    const activeId = String(active.id);
-    const overId = String(over.id);
-    const oldIndex = localFields.findIndex((f) => f.id === activeId);
-    const newIndex = localFields.findIndex((f) => f.id === overId);
+    const oldIndex = localFields.findIndex((f) => f.id === String(active.id));
+    const newIndex = localFields.findIndex((f) => f.id === String(over.id));
     const reordered = arrayMove(localFields, oldIndex, newIndex);
     setLocalFields(reordered);
-
     await reorderFields.mutateAsync({ formId, fieldIds: reordered.map((f) => f.id) });
   };
 
   const selectedField = localFields.find((f) => f.id === selectedFieldId);
+  const canPublish = localFields.length > 0 && saveStatus === "saved";
 
-  if (isLoading) {
-    return <div className="p-8 text-gray-500">Loading form builder…</div>;
-  }
-
-  if (!formData) {
-    return <div className="p-8 text-red-500">Form not found</div>;
-  }
+  if (isLoading) return <div className="p-8 text-gray-500">Loading form builder…</div>;
+  if (!formData) return <div className="p-8 text-red-500">Form not found</div>;
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-full flex flex-col">
       {/* Top bar */}
-      <div className="h-14 border-b bg-white flex items-center px-4 gap-4 shrink-0">
+      <div className="h-14 border-b bg-white flex items-center px-4 gap-2 shrink-0 overflow-x-auto">
         <input
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
           className="text-sm font-semibold bg-transparent border-0 outline-none flex-1 min-w-0"
           placeholder="Form title"
         />
-        <span className="text-xs text-gray-400 shrink-0">
-          {saveStatus === "saved"
-            ? "Saved"
-            : saveStatus === "saving"
-              ? "Saving…"
-              : "Unsaved changes"}
+        <span className={`text-xs shrink-0 ${SAVE_STATUS_CLASSES[saveStatus]}`}>
+          {SAVE_STATUS_LABELS[saveStatus]}
         </span>
         <Separator orientation="vertical" className="h-6" />
-        <Button size="sm" variant="outline" asChild>
-          <a href={`/f/${formData.slug}`} target="_blank" rel="noreferrer" className="flex items-center gap-1">
-            <Eye className="h-3 w-3" /> Preview
-          </a>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!formData.isPublished || saveStatus !== "saved"}
+          title={
+            saveStatus !== "saved"
+              ? "Save your changes before previewing"
+              : !formData.isPublished
+                ? "Publish the form before previewing"
+                : undefined
+          }
+          onClick={() => window.open(`/f/${formData.slug}`, "_blank")}
+        >
+          <Eye className="h-3 w-3" /> Preview
         </Button>
         {formData.isPublished ? (
           <Button
@@ -416,6 +443,14 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
           <Button
             size="sm"
             className="bg-green-600 hover:bg-green-700"
+            disabled={!canPublish}
+            title={
+              localFields.length === 0
+                ? "Add at least one field before publishing"
+                : saveStatus !== "saved"
+                  ? "Save your changes before publishing"
+                  : undefined
+            }
             onClick={() => publishForm.mutate({ formId })}
           >
             <Globe className="h-3 w-3 mr-1" /> Publish
@@ -423,9 +458,29 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         )}
       </div>
 
+      {/* Mobile tab bar */}
+      <div className="md:hidden flex border-b bg-white shrink-0">
+        {(["add", "fields", "config"] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setMobilePanel(tab)}
+            className={`flex-1 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+              mobilePanel === tab
+                ? "border-violet-600 text-violet-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {tab === "add" ? "Add Field" : tab === "fields" ? "Fields" : "Configure"}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Add fields */}
-        <div className="w-52 shrink-0 border-r bg-gray-50 p-3 overflow-y-auto">
+        <div
+          className={`${mobilePanel === "add" ? "block" : "hidden"} md:block w-full md:w-52 shrink-0 border-r bg-gray-50 p-3 overflow-y-auto`}
+        >
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Add field
           </p>
@@ -453,7 +508,9 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         </div>
 
         {/* Center: Field list */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+        <div
+          className={`${mobilePanel === "fields" ? "block" : "hidden"} md:block flex-1 overflow-y-auto p-6 bg-gray-50`}
+        >
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -475,7 +532,10 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
                     key={field.id}
                     field={field}
                     isSelected={selectedFieldId === field.id}
-                    onSelect={() => setSelectedFieldId(field.id)}
+                    onSelect={() => {
+                      setSelectedFieldId(field.id);
+                      setMobilePanel("config");
+                    }}
                     onDelete={() => {
                       deleteField.mutate({ fieldId: field.id });
                       if (selectedFieldId === field.id) setSelectedFieldId(null);
@@ -488,10 +548,21 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         </div>
 
         {/* Right: Field config */}
-        <div className="w-72 shrink-0 border-l bg-white p-4 overflow-y-auto">
+        <div
+          className={`${mobilePanel === "config" ? "block" : "hidden"} md:block w-full md:w-72 shrink-0 border-l bg-white p-4 overflow-y-auto`}
+        >
           {selectedField ? (
             <>
-              <h3 className="text-sm font-semibold mb-4">Field settings</h3>
+              <div className="flex items-center gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setMobilePanel("fields")}
+                  className="md:hidden text-xs text-violet-600 hover:underline"
+                >
+                  ← Back
+                </button>
+                <h3 className="text-sm font-semibold">Field settings</h3>
+              </div>
               <FieldConfig
                 field={selectedField}
                 onUpdate={(data) => handleFieldUpdate(selectedField.id, data)}

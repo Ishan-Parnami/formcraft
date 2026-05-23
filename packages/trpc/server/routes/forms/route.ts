@@ -1,8 +1,9 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { eq, and, ne } from "@formforge/db";
 import db, { forms, fields } from "@formforge/db";
 import { CreateFormSchema, UpdateFormSchema } from "@formforge/schemas/form";
-import { generateUniqueSlug, slugify } from "@formforge/utils";
+import { generateUniqueSlug } from "@formforge/utils";
 import bcrypt from "bcryptjs";
 import { publicProcedure, protectedProcedure, router } from "../../trpc";
 
@@ -64,6 +65,18 @@ export const formsRouter = router({
   publish: protectedProcedure
     .input(z.object({ formId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      const formFields = await db
+        .select({ id: fields.id })
+        .from(fields)
+        .where(eq(fields.formId, input.formId));
+
+      if (formFields.length === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Add at least one field before publishing",
+        });
+      }
+
       const [form] = await db
         .update(forms)
         .set({ isPublished: true, updatedAt: new Date() })

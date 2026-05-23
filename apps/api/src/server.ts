@@ -22,7 +22,6 @@ app.use(
 
 app.use(express.json());
 
-// Attach user from JWT/session token if present
 app.use((req, _res, next) => {
   const auth = req.headers.authorization;
   if (auth?.startsWith("Bearer ") && env.NEXTAUTH_SECRET) {

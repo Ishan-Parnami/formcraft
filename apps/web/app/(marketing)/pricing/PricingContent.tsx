@@ -103,7 +103,7 @@ export default function PricingContent({ isLoggedIn }: { isLoggedIn: boolean }) 
         <h1 className="text-4xl font-bold text-center mb-4">Simple, transparent pricing</h1>
         <p className="text-gray-500 text-center mb-4">No hidden fees. Upgrade or cancel anytime.</p>
         <p className="text-center text-sm text-violet-600 font-medium mb-10">
-          No payment required for demo — all plans fully functional
+          No payment required for demo
         </p>
 
         {/* Toggle */}

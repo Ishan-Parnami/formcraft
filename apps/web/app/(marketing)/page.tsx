@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
 import { CheckCircle2, Zap, BarChart3, Palette, Share2, ArrowRight, Star } from "lucide-react";
+import { auth } from "~/auth";
 
 const features = [
   {
@@ -54,7 +55,8 @@ const testimonials = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
@@ -66,12 +68,20 @@ export default function LandingPage() {
             <Link href="/explore" className="text-gray-600 hover:text-gray-900">Explore</Link>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" size="sm">Log in</Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get started free</Button>
-            </Link>
+            {session?.user ? (
+              <Link href="/dashboard">
+                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Go to Dashboard →</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">Log in</Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get started free</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

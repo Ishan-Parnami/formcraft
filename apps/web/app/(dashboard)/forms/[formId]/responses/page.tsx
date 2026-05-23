@@ -40,7 +40,7 @@ function ResponseRow({
         <span className="text-xs font-mono text-gray-400 w-6">{index}</span>
         <span className="font-mono text-xs text-gray-500 flex-1">{response.id.slice(0, 8)}…</span>
         <span className="text-xs text-gray-400">
-          {response.createdAt ? new Date(response.createdAt).toLocaleString() : ""}
+          {response.createdAt ? new Date(response.createdAt).toLocaleString("en-US") : ""}
         </span>
         {response.completionTime && (
           <Badge variant="outline" className="text-xs">{response.completionTime}s</Badge>

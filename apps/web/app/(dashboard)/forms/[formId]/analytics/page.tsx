@@ -250,7 +250,7 @@ export default function AnalyticsPage({ params }: { params: Promise<{ formId: st
               {responsesData.responses.map((r) => (
                 <div key={r.id} className="flex items-center justify-between py-2 text-sm">
                   <span className="font-mono text-xs text-gray-500">{r.id.slice(0, 8)}…</span>
-                  <span className="text-gray-400 text-xs">{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ""}</span>
+                  <span className="text-gray-400 text-xs">{r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-US") : ""}</span>
                   <span className="text-gray-400 text-xs">{r.completionTime ? `${r.completionTime}s` : "—"}</span>
                   <span className="text-gray-400 text-xs">{r.respondentEmail ?? "—"}</span>
                 </div>

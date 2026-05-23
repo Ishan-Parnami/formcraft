@@ -5,6 +5,7 @@ import { Badge } from "~/components/ui/badge";
 import db, { forms, responses } from "@formforge/db";
 import { eq, and, desc, count, ilike, or } from "@formforge/db";
 import ExploreSearch from "./search";
+import { auth } from "~/auth";
 
 export const revalidate = 60;
 
@@ -55,6 +56,7 @@ export default async function ExplorePage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
+  const session = await auth();
   const [allForms, featuredForms] = await Promise.all([
     getPublicForms(q),
     q ? Promise.resolve([]) : getFeaturedForms(),
@@ -69,8 +71,16 @@ export default async function ExplorePage({
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold text-violet-600">FormForge</Link>
           <div className="flex gap-3">
-            <Link href="/login"><Button variant="ghost" size="sm">Log in</Button></Link>
-            <Link href="/register"><Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get started</Button></Link>
+            {session?.user ? (
+              <Link href="/dashboard">
+                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">Go to Dashboard →</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login"><Button variant="ghost" size="sm">Log in</Button></Link>
+                <Link href="/register"><Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get started</Button></Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

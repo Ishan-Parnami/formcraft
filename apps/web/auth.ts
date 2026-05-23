@@ -8,7 +8,7 @@ import db, { users } from "@formforge/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 5 * 24 * 60 * 60 },
   pages: {
     signIn: "/login",
     error: "/login",

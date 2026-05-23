@@ -244,16 +244,21 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
   const [startTime] = useState(() => Date.now());
   const [unlocked, setUnlocked] = useState(false);
 
+  const settings = (form.settings ?? {}) as Record<string, unknown>;
+
   const submitResponse = trpc.responses.submit.useMutation({
     onSuccess: () => {
-      router.push(`/f/${form.slug}/success`);
+      const redirectUrl = settings.redirectUrl as string | undefined;
+      if (redirectUrl?.startsWith("http")) {
+        window.location.href = redirectUrl;
+      } else {
+        router.push(`/f/${form.slug}/success`);
+      }
     },
     onError: (err) => {
       alert(err.message);
     },
   });
-
-  const settings = (form.settings ?? {}) as Record<string, unknown>;
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -307,7 +312,7 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
           {form.description && <p className="text-gray-500">{form.description}</p>}
         </div>
 
-        <div className="bg-white shadow-sm p-8" style={{ borderRadius }}>
+        <div className="bg-white shadow-sm p-8" style={{ borderRadius, color: "#111827" }}>
           {form.fields.map((field) => (
             <FieldRenderer
               key={field.id}

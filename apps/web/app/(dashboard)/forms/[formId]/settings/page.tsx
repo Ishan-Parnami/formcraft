@@ -10,7 +10,8 @@ import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import { ArrowLeft, Copy, Check, ExternalLink, QrCode } from "lucide-react";
+import { ArrowLeft, Copy, Check, ExternalLink, QrCode, Globe2, Zap } from "lucide-react";
+import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -177,6 +178,103 @@ export default function FormSettingsPage({ params }: { params: Promise<{ formId:
               <p className="text-xs text-gray-400 mt-1">
                 Lowercase letters, numbers, and hyphens only.
               </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Visibility */}
+        <Card>
+          <CardContent className="p-5 space-y-3">
+            <h2 className="font-semibold text-sm">Form visibility</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {(
+                [
+                  {
+                    value: "public",
+                    icon: "🌐",
+                    title: "Public",
+                    desc: "Appears in explore page and public galleries",
+                  },
+                  {
+                    value: "unlisted",
+                    icon: "🔗",
+                    title: "Unlisted",
+                    desc: "Only accessible via direct link",
+                  },
+                ] as const
+              ).map(({ value, icon, title, desc }) => {
+                const active = (formData.visibility ?? "unlisted") === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => updateForm.mutate({ formId, visibility: value })}
+                    className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                      active
+                        ? "border-violet-500 bg-violet-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="text-base mb-0.5">
+                      {icon}{" "}
+                      <span className={`text-sm font-medium ${active ? "text-violet-700" : ""}`}>
+                        {title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">{desc}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Custom Domain — coming soon */}
+        <Card>
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
+                <Globe2 className="h-4 w-4" /> Custom Domain
+              </h2>
+              <ComingSoonBadge />
+            </div>
+            <div className="opacity-40 pointer-events-none select-none">
+              <p className="text-xs text-gray-500 mb-2">
+                Connect your own domain like{" "}
+                <span className="font-mono">forms.yourcompany.com</span>
+              </p>
+              <input
+                disabled
+                placeholder="yourdomain.com"
+                className="w-full border rounded-md px-3 py-2 text-sm bg-gray-50"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Integrations — coming soon */}
+        <Card>
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-sm flex items-center gap-2">
+                <Zap className="h-4 w-4" /> Integrations
+              </h2>
+              <ComingSoonBadge />
+            </div>
+            <div className="opacity-40 pointer-events-none select-none">
+              <p className="text-xs text-gray-500">
+                Connect Slack, Zapier, Webhooks and more to automate your workflows.
+              </p>
+              <div className="mt-3 flex gap-2">
+                {["Slack", "Zapier", "Webhook", "Notion"].map((i) => (
+                  <span
+                    key={i}
+                    className="text-xs px-2 py-1 border rounded-md bg-white text-gray-600"
+                  >
+                    {i}
+                  </span>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>

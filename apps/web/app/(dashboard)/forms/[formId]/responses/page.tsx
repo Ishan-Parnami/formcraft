@@ -8,7 +8,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
 import { ArrowLeft, Download, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
-import type { RouterOutputs } from "@formcraft/trpc/client";
+import type { RouterOutputs } from "@formforge/trpc/client";
 
 type Response = RouterOutputs["responses"]["list"]["responses"][number];
 

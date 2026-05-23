@@ -3,8 +3,8 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcryptjs";
-import { eq } from "@formcraft/db";
-import db, { users } from "@formcraft/db";
+import { eq } from "@formforge/db";
+import db, { users } from "@formforge/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),

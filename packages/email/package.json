@@ -1,11 +1,11 @@
 {
-  "name": "@formcraft/email",
+  "name": "@formforge/email",
   "version": "1.0.0",
   "exports": {
     ".": "./src/index.ts"
   },
   "devDependencies": {
-    "@formcraft/typescript-config": "workspace:*",
+    "@formforge/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/react": "^19.0.0",
     "typescript": "^5.9.3"

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema, type LoginInput } from "@formcraft/schemas/user";
+import { LoginSchema, type LoginInput } from "@formforge/schemas/user";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -44,7 +44,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <Link href="/" className="block text-center text-xl font-bold text-violet-600 mb-8">
-          FormCraft
+          FormForge
         </Link>
         <Card>
           <CardHeader className="pb-2">
@@ -89,7 +89,7 @@ export default function LoginPage() {
               <Link href="/register" className="text-violet-600 hover:underline">Sign up</Link>
             </p>
             <div className="mt-4 p-3 bg-blue-50 rounded-md text-xs text-blue-700">
-              <strong>Demo:</strong> demo@formcraft.dev / Demo@1234
+              <strong>Demo:</strong> demo@formforge.dev / Demo@1234
             </div>
           </CardContent>
         </Card>

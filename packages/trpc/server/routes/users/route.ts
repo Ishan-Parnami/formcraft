@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { eq } from "@formcraft/db";
-import db, { users } from "@formcraft/db";
-import { UpdateProfileSchema } from "@formcraft/schemas/user";
+import { eq } from "@formforge/db";
+import db, { users } from "@formforge/db";
+import { UpdateProfileSchema } from "@formforge/schemas/user";
 import { protectedProcedure, router } from "../../trpc";
 
 export const usersRouter = router({

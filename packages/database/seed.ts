@@ -169,7 +169,7 @@ const PRESET_THEMES = [
 // ── Main seed function ────────────────────────────────────────────────────────
 
 async function seed() {
-  console.log("🌱 Seeding FormCraft database…");
+  console.log("🌱 Seeding FormForge database…");
 
   // ── 1. Upsert themes ───────────────────────────────────────────────────────
   console.log("  Seeding themes…");
@@ -183,7 +183,7 @@ async function seed() {
   // ── 2. Demo user ───────────────────────────────────────────────────────────
   console.log("  Seeding demo user…");
   const hashedPassword = await bcrypt.hash("Demo@1234", 10);
-  const existingUser = await db.select().from(users).where(eq(users.email, "demo@formcraft.dev"));
+  const existingUser = await db.select().from(users).where(eq(users.email, "demo@formforge.dev"));
   let userId: string;
   if (existingUser.length > 0) {
     userId = existingUser[0]!.id;
@@ -191,7 +191,7 @@ async function seed() {
   } else {
     const insertedUsers = await db
       .insert(users)
-      .values({ name: "Alex Rivera", email: "demo@formcraft.dev", password: hashedPassword })
+      .values({ name: "Alex Rivera", email: "demo@formforge.dev", password: hashedPassword })
       .returning();
     userId = insertedUsers[0]!.id;
   }
@@ -592,7 +592,7 @@ async function seed() {
   await seedViews(form3.id, 190);
 
   console.log("\n✅ Seed complete!");
-  console.log("   Demo user: demo@formcraft.dev / Demo@1234");
+  console.log("   Demo user: demo@formforge.dev / Demo@1234");
   console.log("   Forms seeded: 5");
   console.log("     - anime-alignment-survey (public, 47 responses, ~310 views)");
   console.log("     - dev-tools-2025 (public, 83 responses, ~470 views)");

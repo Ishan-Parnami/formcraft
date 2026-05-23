@@ -11,8 +11,8 @@ import { Label } from "~/components/ui/label";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { RouterOutputs } from "@formcraft/trpc/client";
-import type { CreateFieldInput } from "@formcraft/schemas/form";
+import type { RouterOutputs } from "@formforge/trpc/client";
+import type { CreateFieldInput } from "@formforge/schemas/form";
 import {
   GripVertical, Plus, Trash2, Eye, Globe, Lock,
   Type, AlignLeft, Mail, Hash, ChevronDown, CheckSquare, Star, Calendar, List,

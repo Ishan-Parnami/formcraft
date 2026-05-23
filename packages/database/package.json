@@ -1,5 +1,5 @@
 {
-  "name": "@formcraft/db",
+  "name": "@formforge/db",
   "version": "1.0.0",
   "exports": {
     ".": "./index.ts"
@@ -11,8 +11,8 @@
     "seed": "dotenv -- tsx seed.ts"
   },
   "devDependencies": {
-    "@formcraft/eslint-config": "workspace:*",
-    "@formcraft/typescript-config": "workspace:*",
+    "@formforge/eslint-config": "workspace:*",
+    "@formforge/typescript-config": "workspace:*",
     "@types/bcryptjs": "^2.4.6",
     "@types/pg": "^8.16.0",
     "dotenv-cli": "^11.0.0",

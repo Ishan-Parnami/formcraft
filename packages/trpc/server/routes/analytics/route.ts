@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { eq, and, count, avg, sql, desc } from "@formcraft/db";
-import db, { forms, responses, fields, formViews } from "@formcraft/db";
+import { eq, and, count, avg, sql, desc } from "@formforge/db";
+import db, { forms, responses, fields, formViews } from "@formforge/db";
 import { protectedProcedure, router } from "../../trpc";
 
 export const analyticsRouter = router({

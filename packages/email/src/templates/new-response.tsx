@@ -18,7 +18,7 @@ export function NewResponseEmail({
     <div style={{ fontFamily: "Inter, sans-serif", maxWidth: 560, margin: "0 auto", padding: "32px 24px", backgroundColor: "#ffffff" }}>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: 18 }}>FormCraft</span>
+        <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: 18 }}>FormForge</span>
       </div>
 
       <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827", margin: "0 0 8px" }}>
@@ -67,7 +67,7 @@ export function NewResponseEmail({
       {/* Footer */}
       <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "32px 0 16px" }} />
       <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>
-        Sent by <a href="https://formcraft.dev" style={{ color: "#7c3aed", textDecoration: "none" }}>FormCraft</a>.
+        Sent by <a href="https://formforge.dev" style={{ color: "#7c3aed", textDecoration: "none" }}>FormForge</a>.
         You&apos;re receiving this because you own this form.
       </p>
     </div>

@@ -8,7 +8,7 @@ async function init() {
     const server = http.createServer(expressApplication);
     const PORT = parseInt(env.PORT ?? "3001", 10);
     server.listen(PORT, () => {
-      console.log(`[formcraft] API server running on http://localhost:${PORT}`);
+      console.log(`[formforge] API server running on http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error("Error starting server:", err);

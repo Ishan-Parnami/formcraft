@@ -1,5 +1,5 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { serverRouter } from "@formcraft/trpc/server";
+import { serverRouter } from "@formforge/trpc/server";
 import { auth } from "~/auth";
 
 const handler = async (req: Request) => {

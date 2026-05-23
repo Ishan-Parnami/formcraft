@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import db, { forms, fields } from "@formcraft/db";
-import { eq, and } from "@formcraft/db";
-import type { SelectField } from "@formcraft/db";
+import db, { forms, fields } from "@formforge/db";
+import { eq, and } from "@formforge/db";
+import type { SelectField } from "@formforge/db";
 import PublicFormClient from "./PublicFormClient";
 
 export const dynamic = "force-dynamic";

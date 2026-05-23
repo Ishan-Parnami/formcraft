@@ -1,5 +1,5 @@
 {
-  "name": "@formcraft/schemas",
+  "name": "@formforge/schemas",
   "version": "1.0.0",
   "exports": {
     ".": "./src/index.ts",
@@ -8,7 +8,7 @@
     "./user": "./src/user.ts"
   },
   "devDependencies": {
-    "@formcraft/typescript-config": "workspace:*",
+    "@formforge/typescript-config": "workspace:*",
     "typescript": "^5.9.3"
   },
   "dependencies": {

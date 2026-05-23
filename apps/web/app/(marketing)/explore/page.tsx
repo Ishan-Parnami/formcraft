@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import db, { forms, responses } from "@formcraft/db";
-import { eq, and, desc, count, ilike, or } from "@formcraft/db";
+import db, { forms, responses } from "@formforge/db";
+import { eq, and, desc, count, ilike, or } from "@formforge/db";
 import ExploreSearch from "./search";
 
 export const revalidate = 60;
@@ -67,7 +67,7 @@ export default async function ExplorePage({
     <div className="min-h-screen bg-white">
       <nav className="border-b">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-violet-600">FormCraft</Link>
+          <Link href="/" className="text-xl font-bold text-violet-600">FormForge</Link>
           <div className="flex gap-3">
             <Link href="/login"><Button variant="ghost" size="sm">Log in</Button></Link>
             <Link href="/register"><Button size="sm" className="bg-violet-600 hover:bg-violet-700">Get started</Button></Link>

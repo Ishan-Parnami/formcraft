@@ -1,5 +1,5 @@
 {
-  "extends": ["@formcraft/typescript-config/base.json"],
+  "extends": ["@formforge/typescript-config/base.json"],
   "compilerOptions": {
     "moduleResolution": "bundler",
     "module": "esnext",

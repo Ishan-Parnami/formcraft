@@ -1,13 +1,13 @@
 {
-  "name": "formcraft",
+  "name": "formforge",
   "private": true,
   "scripts": {
     "build": "dotenv -- turbo build",
     "dev": "dotenv -- turbo dev",
-    "db:generate": "turbo --filter=@formcraft/db db:generate",
-    "db:migrate": "turbo --filter=@formcraft/db db:migrate",
-    "db:seed": "turbo --filter=@formcraft/db seed",
-    "db:studio": "turbo --filter=@formcraft/db studio",
+    "db:generate": "turbo --filter=@formforge/db db:generate",
+    "db:migrate": "turbo --filter=@formforge/db db:migrate",
+    "db:seed": "turbo --filter=@formforge/db seed",
+    "db:studio": "turbo --filter=@formforge/db studio",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"

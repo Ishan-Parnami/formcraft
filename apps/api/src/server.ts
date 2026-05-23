@@ -6,8 +6,8 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { generateOpenApiDocument, createOpenApiExpressMiddleware } from "trpc-to-openapi";
 import { apiReference } from "@scalar/express-api-reference";
 
-import { serverRouter, createContext } from "@formcraft/trpc/server";
-import type { SessionUser, CreateContextOptions } from "@formcraft/trpc/server";
+import { serverRouter, createContext } from "@formforge/trpc/server";
+import type { SessionUser, CreateContextOptions } from "@formforge/trpc/server";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 
 import { env } from "./env";
@@ -42,13 +42,13 @@ app.use((req, _res, next) => {
 });
 
 const openApiDocument = generateOpenApiDocument(serverRouter, {
-  title: "FormCraft API",
+  title: "FormForge API",
   version: "1.0.0",
   baseUrl: env.BASE_URL.concat("/api"),
 });
 
 app.get("/", (_req, res) => {
-  res.json({ message: "FormCraft API is running", version: "1.0.0" });
+  res.json({ message: "FormForge API is running", version: "1.0.0" });
 });
 
 app.get("/health", (_req, res) => {

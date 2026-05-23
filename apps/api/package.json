@@ -1,5 +1,5 @@
 {
-  "name": "@formcraft/server",
+  "name": "@formforge/server",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,8 +9,8 @@
     "lint": "eslint src/*"
   },
   "devDependencies": {
-    "@formcraft/eslint-config": "workspace:*",
-    "@formcraft/typescript-config": "workspace:*",
+    "@formforge/eslint-config": "workspace:*",
+    "@formforge/typescript-config": "workspace:*",
     "@swc/core": "^1.15.8",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -22,7 +22,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@formcraft/trpc": "workspace:*",
+    "@formforge/trpc": "workspace:*",
     "@scalar/express-api-reference": "^0.8.30",
     "@trpc/server": "^11.8.1",
     "@upstash/ratelimit": "^2.0.8",

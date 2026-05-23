@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { eq, and, ne } from "@formcraft/db";
-import db, { forms, fields } from "@formcraft/db";
-import { CreateFormSchema, UpdateFormSchema } from "@formcraft/schemas/form";
-import { generateUniqueSlug, slugify } from "@formcraft/utils";
+import { eq, and, ne } from "@formforge/db";
+import db, { forms, fields } from "@formforge/db";
+import { CreateFormSchema, UpdateFormSchema } from "@formforge/schemas/form";
+import { generateUniqueSlug, slugify } from "@formforge/utils";
 import bcrypt from "bcryptjs";
 import { publicProcedure, protectedProcedure, router } from "../../trpc";
 

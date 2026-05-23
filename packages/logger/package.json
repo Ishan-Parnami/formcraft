@@ -1,10 +1,10 @@
 {
-  "name": "@formcraft/logger",
+  "name": "@formforge/logger",
   "version": "1.0.0",
   "scripts": {},
   "devDependencies": {
-    "@formcraft/eslint-config": "workspace:*",
-    "@formcraft/typescript-config": "workspace:*",
+    "@formforge/eslint-config": "workspace:*",
+    "@formforge/typescript-config": "workspace:*",
     "typescript": "^5.9.3"
   },
   "dependencies": {

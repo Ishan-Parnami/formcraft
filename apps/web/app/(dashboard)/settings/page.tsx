@@ -3,7 +3,7 @@
 import { trpc } from "~/trpc/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateProfileSchema, type UpdateProfileInput } from "@formcraft/schemas/user";
+import { UpdateProfileSchema, type UpdateProfileInput } from "@formforge/schemas/user";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";

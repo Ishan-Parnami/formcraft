@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CreateFormSchema, type CreateFormInput } from "@formcraft/schemas/form";
+import { CreateFormSchema, type CreateFormInput } from "@formforge/schemas/form";
 import { trpc } from "~/trpc/client";
 
 type CreateFormValues = z.input<typeof CreateFormSchema>;

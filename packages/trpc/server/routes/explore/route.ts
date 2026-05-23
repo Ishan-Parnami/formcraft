@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { eq, and, ilike, desc, count } from "@formcraft/db";
-import db, { forms, themes } from "@formcraft/db";
+import { eq, and, ilike, desc, count } from "@formforge/db";
+import db, { forms, themes } from "@formforge/db";
 import { publicProcedure, router } from "../../trpc";
 
 export const exploreRouter = router({

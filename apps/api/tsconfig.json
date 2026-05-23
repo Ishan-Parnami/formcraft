@@ -1,5 +1,5 @@
 {
-  "extends": "@formcraft/typescript-config/node.json",
+  "extends": "@formforge/typescript-config/node.json",
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",

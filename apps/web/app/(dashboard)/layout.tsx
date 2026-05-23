@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Sidebar */}
       <aside className="w-60 shrink-0 bg-white border-r flex flex-col">
         <div className="h-16 border-b flex items-center px-4">
-          <Link href="/" className="text-lg font-bold text-violet-600">FormCraft</Link>
+          <Link href="/" className="text-lg font-bold text-violet-600">FormForge</Link>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">

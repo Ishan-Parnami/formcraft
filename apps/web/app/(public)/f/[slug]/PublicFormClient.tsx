@@ -10,7 +10,7 @@ import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import type { SelectField } from "@formcraft/db";
+import type { SelectField } from "@formforge/db";
 import { Star } from "lucide-react";
 
 interface FieldValue {

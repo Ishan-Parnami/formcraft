@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
-import db, { forms } from "@formcraft/db";
-import { eq } from "@formcraft/db";
+import db, { forms } from "@formforge/db";
+import { eq } from "@formforge/db";
 
 export default async function SuccessPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

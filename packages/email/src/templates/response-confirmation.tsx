@@ -9,7 +9,7 @@ export function ResponseConfirmationEmail({ formTitle, answers }: ResponseConfir
   return (
     <div style={{ fontFamily: "Inter, sans-serif", maxWidth: 560, margin: "0 auto", padding: "32px 24px", backgroundColor: "#ffffff" }}>
       <div style={{ marginBottom: 32 }}>
-        <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: 18 }}>FormCraft</span>
+        <span style={{ color: "#7c3aed", fontWeight: 700, fontSize: 18 }}>FormForge</span>
       </div>
 
       <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827", margin: "0 0 8px" }}>
@@ -30,7 +30,7 @@ export function ResponseConfirmationEmail({ formTitle, answers }: ResponseConfir
 
       <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "24px 0 16px" }} />
       <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>
-        Powered by <a href="https://formcraft.dev" style={{ color: "#7c3aed", textDecoration: "none" }}>FormCraft</a>.
+        Powered by <a href="https://formforge.dev" style={{ color: "#7c3aed", textDecoration: "none" }}>FormForge</a>.
       </p>
     </div>
   );

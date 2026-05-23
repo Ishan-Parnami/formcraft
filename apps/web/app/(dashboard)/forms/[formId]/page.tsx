@@ -5,8 +5,8 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
 import { Edit, BarChart3, MessageSquare, Settings, Eye, Copy } from "lucide-react";
-import db, { forms, fields, responses } from "@formcraft/db";
-import { eq, count } from "@formcraft/db";
+import db, { forms, fields, responses } from "@formforge/db";
+import { eq, count } from "@formforge/db";
 
 export default async function FormOverviewPage({ params }: { params: Promise<{ formId: string }> }) {
   const { formId } = await params;

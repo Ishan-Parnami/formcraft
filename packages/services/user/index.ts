@@ -1,4 +1,4 @@
-import db, { users as usersTable } from "@formcraft/db";
+import db, { users as usersTable } from "@formforge/db";
 import { env } from "../env";
 import { googleOAuth2Client } from "../clients/google-oauth";
 import { GetAuthenticationMethodOutputSchema } from "./model";

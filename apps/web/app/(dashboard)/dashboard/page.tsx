@@ -5,8 +5,8 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Plus, FileText, Eye, MessageSquare } from "lucide-react";
-import db, { forms, responses, formViews } from "@formcraft/db";
-import { eq, count } from "@formcraft/db";
+import db, { forms, responses, formViews } from "@formforge/db";
+import { eq, count } from "@formforge/db";
 
 async function getDashboardData(userId: string) {
   const userForms = await db.select().from(forms).where(eq(forms.userId, userId));

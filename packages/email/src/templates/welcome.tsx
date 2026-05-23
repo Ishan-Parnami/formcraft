@@ -7,7 +7,7 @@ interface WelcomeEmailProps {
 export function WelcomeEmail({ name }: WelcomeEmailProps) {
   return (
     <div style={{ fontFamily: "Inter, sans-serif", padding: "32px" }}>
-      <h1>Welcome to FormCraft, {name}!</h1>
+      <h1>Welcome to FormForge, {name}!</h1>
       <p>Start building beautiful forms in minutes.</p>
     </div>
   );

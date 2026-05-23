@@ -5,8 +5,8 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Plus, FileText, Edit, BarChart3, Eye } from "lucide-react";
-import db, { forms } from "@formcraft/db";
-import { eq } from "@formcraft/db";
+import db, { forms } from "@formforge/db";
+import { eq } from "@formforge/db";
 
 export default async function FormsPage() {
   const session = await auth();

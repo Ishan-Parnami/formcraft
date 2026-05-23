@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { eq } from "@formcraft/db";
-import db, { users } from "@formcraft/db";
-import { RegisterSchema } from "@formcraft/schemas/user";
+import { eq } from "@formforge/db";
+import db, { users } from "@formforge/db";
+import { RegisterSchema } from "@formforge/schemas/user";
 
 export async function POST(req: NextRequest) {
   try {

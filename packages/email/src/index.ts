@@ -26,7 +26,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<void> {
     return;
   }
 
-  const from = process.env["EMAIL_FROM"] ?? "FormCraft <noreply@formcraft.dev>";
+  const from = process.env["EMAIL_FROM"] ?? "FormForge <noreply@formforge.dev>";
   const { error } = await client.emails.send({ from, to: options.to, subject: options.subject, react: options.react });
   if (error) console.error("[email] Resend error:", error);
 }

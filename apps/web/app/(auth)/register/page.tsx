@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterSchema, type RegisterInput } from "@formcraft/schemas/user";
+import { RegisterSchema, type RegisterInput } from "@formforge/schemas/user";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -51,7 +51,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <Link href="/" className="block text-center text-xl font-bold text-violet-600 mb-8">
-          FormCraft
+          FormForge
         </Link>
         <Card>
           <CardHeader className="pb-2">

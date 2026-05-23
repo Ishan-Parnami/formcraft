@@ -1,5 +1,5 @@
 {
-  "name": "@formcraft/web",
+  "name": "@formforge/web",
   "version": "0.1.0",
   "type": "module",
   "private": true,
@@ -15,9 +15,9 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@formcraft/db": "workspace:*",
-    "@formcraft/schemas": "workspace:*",
-    "@formcraft/trpc": "workspace:*",
+    "@formforge/db": "workspace:*",
+    "@formforge/schemas": "workspace:*",
+    "@formforge/trpc": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -76,8 +76,8 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@formcraft/eslint-config": "workspace:*",
-    "@formcraft/typescript-config": "workspace:*",
+    "@formforge/eslint-config": "workspace:*",
+    "@formforge/typescript-config": "workspace:*",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",

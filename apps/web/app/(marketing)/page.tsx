@@ -43,7 +43,7 @@ const testimonials = [
   {
     name: "Carlos Mendez",
     role: "Indie Hacker",
-    body: "I build waitlist forms for every side project. FormCraft is now my default — free tier is super generous.",
+    body: "I build waitlist forms for every side project. FormForge is now my default — free tier is super generous.",
     rating: 5,
   },
   {
@@ -60,7 +60,7 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="border-b sticky top-0 bg-white/80 backdrop-blur z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-violet-600">FormCraft</Link>
+          <Link href="/" className="text-xl font-bold text-violet-600">FormForge</Link>
           <div className="hidden md:flex items-center gap-6 text-sm">
             <Link href="/pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
             <Link href="/explore" className="text-gray-600 hover:text-gray-900">Explore</Link>
@@ -172,14 +172,14 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-          <div className="font-bold text-gray-900">FormCraft</div>
+          <div className="font-bold text-gray-900">FormForge</div>
           <div className="flex gap-6">
             <Link href="/pricing">Pricing</Link>
             <Link href="/explore">Explore</Link>
             <Link href="/login">Login</Link>
             <Link href="/register">Sign up</Link>
           </div>
-          <div>© {new Date().getFullYear()} FormCraft</div>
+          <div>© {new Date().getFullYear()} FormForge</div>
         </div>
       </footer>
     </div>

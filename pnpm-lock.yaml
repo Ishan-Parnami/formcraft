@@ -24,7 +24,7 @@ importers:
 
   apps/api:
     dependencies:
-      '@formcraft/trpc':
+      '@formforge/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
       '@scalar/express-api-reference':
@@ -58,10 +58,10 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
-      '@formcraft/eslint-config':
+      '@formforge/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
       '@swc/core':
@@ -106,13 +106,13 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.0)
-      '@formcraft/db':
+      '@formforge/db':
         specifier: workspace:*
         version: link:../../packages/database
-      '@formcraft/schemas':
+      '@formforge/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
-      '@formcraft/trpc':
+      '@formforge/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
       '@hookform/resolvers':
@@ -284,10 +284,10 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
-      '@formcraft/eslint-config':
+      '@formforge/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
       '@types/bcryptjs':
@@ -333,10 +333,10 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
-      '@formcraft/eslint-config':
+      '@formforge/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/bcryptjs':
@@ -370,7 +370,7 @@ importers:
         specifier: ^6.12.3
         version: 6.12.3(@react-email/render@1.0.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
     devDependencies:
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/node':
@@ -428,10 +428,10 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
-      '@formcraft/eslint-config':
+      '@formforge/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       typescript:
@@ -444,7 +444,7 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       typescript:
@@ -453,10 +453,10 @@ importers:
 
   packages/services:
     dependencies:
-      '@formcraft/db':
+      '@formforge/db':
         specifier: workspace:*
         version: link:../database
-      '@formcraft/logger':
+      '@formforge/logger':
         specifier: workspace:*
         version: link:../logger
       google-auth-library:
@@ -466,10 +466,10 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
-      '@formcraft/eslint-config':
+      '@formforge/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       dotenv-cli:
@@ -481,19 +481,19 @@ importers:
 
   packages/trpc:
     dependencies:
-      '@formcraft/db':
+      '@formforge/db':
         specifier: workspace:*
         version: link:../database
-      '@formcraft/email':
+      '@formforge/email':
         specifier: workspace:*
         version: link:../email
-      '@formcraft/schemas':
+      '@formforge/schemas':
         specifier: workspace:*
         version: link:../schemas
-      '@formcraft/services':
+      '@formforge/services':
         specifier: workspace:*
         version: link:../services
-      '@formcraft/utils':
+      '@formforge/utils':
         specifier: workspace:*
         version: link:../utils
       '@trpc/client':
@@ -512,10 +512,10 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
-      '@formcraft/eslint-config':
+      '@formforge/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       '@types/bcryptjs':
@@ -530,7 +530,7 @@ importers:
 
   packages/types:
     devDependencies:
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       typescript:
@@ -541,7 +541,7 @@ importers:
 
   packages/utils:
     devDependencies:
-      '@formcraft/typescript-config':
+      '@formforge/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       typescript:

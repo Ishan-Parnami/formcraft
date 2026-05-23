@@ -1,4 +1,4 @@
-# FormCraft
+# FormForge
 
 A full-stack form builder SaaS. Create, publish, and analyse forms with a drag-and-drop builder, real-time analytics, email notifications, and a public explore page.
 
@@ -6,7 +6,7 @@ A full-stack form builder SaaS. Create, publish, and analyse forms with a drag-a
 
 | Credential | Value |
 |---|---|
-| Email | `demo@formcraft.dev` |
+| Email | `demo@formforge.dev` |
 | Password | `Demo@1234` |
 
 Five sample forms are pre-seeded (3 public, 2 unlisted) with realistic responses and view counts.
@@ -33,7 +33,7 @@ Five sample forms are pre-seeded (3 public, 2 unlisted) with realistic responses
 ## Project Structure
 
 ```
-formcraft-starter/
+formforge/
 ├── apps/
 │   ├── web/          # Next.js frontend (port 3000)
 │   └── api/          # Express + tRPC server (port 3001)
@@ -78,7 +78,7 @@ formcraft-starter/
 ```bash
 # 1. Clone and install
 git clone <repo-url>
-cd formcraft-starter
+cd formforge
 pnpm install
 
 # 2. Start Postgres
@@ -90,8 +90,8 @@ cp .env.example apps/api/.env
 # Edit both files with your DATABASE_URL, AUTH_SECRET, etc.
 
 # 4. Push schema and seed demo data
-pnpm --filter @formcraft/db db:push
-pnpm --filter @formcraft/db seed
+pnpm --filter @formforge/db db:push
+pnpm --filter @formforge/db seed
 
 # 5. Start everything
 pnpm dev
@@ -114,7 +114,7 @@ Optional (graceful fallbacks in dev):
 | Variable | Description | Fallback |
 |---|---|---|
 | `RESEND_API_KEY` | Resend API key for email | Logs to console |
-| `EMAIL_FROM` | Sender address | `FormCraft <noreply@formcraft.dev>` |
+| `EMAIL_FROM` | Sender address | `FormForge <noreply@formforge.dev>` |
 | `UPSTASH_REDIS_REST_URL` | Upstash Redis URL for rate limiting | In-memory |
 | `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis token | In-memory |
 
@@ -141,8 +141,8 @@ Optional (graceful fallbacks in dev):
 Run migrations after provisioning:
 
 ```bash
-DATABASE_URL=<prod-url> pnpm --filter @formcraft/db db:push
-DATABASE_URL=<prod-url> pnpm --filter @formcraft/db seed
+DATABASE_URL=<prod-url> pnpm --filter @formforge/db db:push
+DATABASE_URL=<prod-url> pnpm --filter @formforge/db seed
 ```
 
 ---
@@ -153,6 +153,6 @@ DATABASE_URL=<prod-url> pnpm --filter @formcraft/db seed
 |---|---|
 | `pnpm dev` | Start web + api in watch mode |
 | `pnpm build` | Build all apps and packages |
-| `pnpm --filter @formcraft/db studio` | Open Drizzle Studio |
-| `pnpm --filter @formcraft/db seed` | Seed demo data |
-| `pnpm --filter @formcraft/web lint` | Lint frontend |
+| `pnpm --filter @formforge/db studio` | Open Drizzle Studio |
+| `pnpm --filter @formforge/db seed` | Seed demo data |
+| `pnpm --filter @formforge/web lint` | Lint frontend |

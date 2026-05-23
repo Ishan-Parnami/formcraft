@@ -1,4 +1,4 @@
-import { httpLink, httpBatchStreamLink } from "@formcraft/trpc/client";
+import { httpLink, httpBatchStreamLink } from "@formforge/trpc/client";
 import { env } from "~/env.js";
 
 interface CreateTRPCHttpBatchClientClientOpts {

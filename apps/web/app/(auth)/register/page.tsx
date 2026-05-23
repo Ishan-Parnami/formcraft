@@ -64,7 +64,7 @@ export default function RegisterPage() {
                 <Label htmlFor="name">Full name</Label>
                 <Input
                   id="name"
-                  placeholder="Ada Lovelace"
+                  placeholder="Manav Joshi"
                   {...register("name")}
                   className="mt-1"
                 />

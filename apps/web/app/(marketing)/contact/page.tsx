@@ -87,7 +87,7 @@ export default function ContactPage() {
               <Input
                 value={form.name}
                 onChange={(e) => set("name", e.target.value)}
-                placeholder="Jane Smith"
+                placeholder="Priya Sharma"
               />
             </Field>
 
@@ -96,7 +96,7 @@ export default function ContactPage() {
                 type="email"
                 value={form.email}
                 onChange={(e) => set("email", e.target.value)}
-                placeholder="jane@company.com"
+                placeholder="priya@company.com"
               />
             </Field>
 
@@ -104,7 +104,7 @@ export default function ContactPage() {
               <Input
                 value={form.company}
                 onChange={(e) => set("company", e.target.value)}
-                placeholder="Acme Corp"
+                placeholder="Infosys Ltd"
               />
             </Field>
 

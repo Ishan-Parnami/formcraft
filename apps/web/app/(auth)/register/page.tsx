@@ -75,7 +75,7 @@ export default function RegisterPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="raj@example.com"
                   {...register("email")}
                   className="mt-1"
                 />

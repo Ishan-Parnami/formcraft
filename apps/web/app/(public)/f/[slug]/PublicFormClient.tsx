@@ -89,7 +89,7 @@ function FieldRenderer({
           type="email"
           value={(value as string) ?? ""}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={field.placeholder ?? "you@example.com"}
+          placeholder={field.placeholder ?? "raj@example.com"}
           className="mt-1"
         />
       )}

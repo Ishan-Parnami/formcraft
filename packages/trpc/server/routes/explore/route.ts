@@ -1,10 +1,44 @@
 import { z } from "zod";
-import { eq, and, ilike, desc, count } from "@formforge/db";
+import { eq, and, desc, count } from "@formforge/db";
 import db, { forms, themes } from "@formforge/db";
 import { publicProcedure, router } from "../../trpc";
 
+const FormSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  userId: z.string(),
+  isPublished: z.boolean().nullable(),
+  visibility: z.string().nullable(),
+  theme: z.unknown(),
+  settings: z.unknown(),
+  createdAt: z.date().nullable(),
+  updatedAt: z.date().nullable(),
+});
+
+const ThemeSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  category: z.string().nullable(),
+  config: z.unknown(),
+  previewImage: z.string().nullable(),
+  isDefault: z.boolean().nullable(),
+  createdAt: z.date().nullable(),
+});
+
 export const exploreRouter = router({
   listPublicForms: publicProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/explore/forms',
+        tags: ['Explore'],
+        summary: 'Browse public forms',
+        protect: false,
+      },
+    })
     .input(
       z.object({
         page: z.number().int().positive().default(1),
@@ -13,6 +47,7 @@ export const exploreRouter = router({
         search: z.string().optional(),
       }),
     )
+    .output(z.object({ forms: z.array(FormSchema), total: z.number(), page: z.number() }))
     .query(async ({ input }) => {
       const offset = (input.page - 1) * input.limit;
       const query = db
@@ -33,7 +68,19 @@ export const exploreRouter = router({
       return { forms: data, total, page: input.page };
     }),
 
-  getFeaturedForms: publicProcedure.query(async () => {
+  getFeaturedForms: publicProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/explore/featured',
+        tags: ['Explore'],
+        summary: 'Get featured public forms',
+        protect: false,
+      },
+    })
+    .input(z.object({}))
+    .output(z.array(FormSchema))
+    .query(async () => {
     return db
       .select()
       .from(forms)
@@ -42,7 +89,19 @@ export const exploreRouter = router({
       .limit(6);
   }),
 
-  listThemes: publicProcedure.query(async () => {
+  listThemes: publicProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/explore/themes',
+        tags: ['Explore'],
+        summary: 'List all themes (public)',
+        protect: false,
+      },
+    })
+    .input(z.object({}))
+    .output(z.array(ThemeSchema))
+    .query(async () => {
     return db.select().from(themes);
   }),
 });

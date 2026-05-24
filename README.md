@@ -141,25 +141,7 @@ DATABASE_URL="postgresql://..." pnpm db:seed
 2. Connect your GitHub repo — Render will detect `render.yaml` and create both services automatically
 3. Set environment variables for each service:
 
-**`formforge-web` (Frontend)**
-
-| Variable | Value |
-|---|---|
-| `DATABASE_URL` | Neon connection string |
-| `NEXTAUTH_SECRET` | Random 32-char string (`openssl rand -hex 32`) |
-| `NEXTAUTH_URL` | Your Render web URL (e.g. `https://formforge-web.onrender.com`) |
-| `NEXT_PUBLIC_APP_URL` | Same as `NEXTAUTH_URL` |
-
-**`formforge-api` (Backend)**
-
-| Variable | Value |
-|---|---|
-| `DATABASE_URL` | Neon connection string |
-| `NEXTAUTH_SECRET` | Same secret as frontend |
-| `BASE_URL` | Your Render API URL (e.g. `https://formforge-api.onrender.com`) |
-| `CORS_ORIGIN` | Your Render web URL (e.g. `https://formforge-web.onrender.com`) |
-
-> API docs available at `https://formforge-api.onrender.com/docs` after deploy.
+> API docs: `https://formforge-builder-api.onrender.com/docs`
 
 > ⚠️ Render free tier spins down after 15 min of inactivity. Open both URLs before a demo to warm them up.
 

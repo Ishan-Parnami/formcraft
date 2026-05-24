@@ -3,9 +3,40 @@ import { eq, and, count, avg, sql, desc } from "@formforge/db";
 import db, { forms, responses, fields, formViews } from "@formforge/db";
 import { protectedProcedure, router } from "../../trpc";
 
+const FormStatsSchema = z.object({
+  totalViews: z.number(),
+  totalResponses: z.number(),
+  completionRate: z.number(),
+  avgCompletionTime: z.number(),
+  responsesByDay: z.array(z.object({ day: z.string(), count: z.number() })),
+  topReferrers: z.array(z.object({ referrer: z.string(), count: z.number() })),
+});
+
+const FieldStatSchema = z.object({
+  fieldId: z.string(),
+  label: z.string(),
+  type: z.string(),
+  responseCount: z.number(),
+  distribution: z.record(z.string(), z.number()).optional(),
+  avgRating: z.number().optional(),
+  avgLength: z.number().optional(),
+  trueCount: z.number().optional(),
+  falseCount: z.number().optional(),
+});
+
 export const analyticsRouter = router({
   getFormStats: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/forms/{formId}/analytics/stats',
+        tags: ['Analytics'],
+        summary: 'Get aggregate stats for a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(FormStatsSchema)
     .query(async ({ ctx, input }) => {
       const formResult = await db
         .select()
@@ -75,7 +106,17 @@ export const analyticsRouter = router({
     }),
 
   getFieldStats: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/forms/{formId}/analytics/field-stats',
+        tags: ['Analytics'],
+        summary: 'Get per-field stats for a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(z.array(FieldStatSchema))
     .query(async ({ ctx, input }) => {
       const formResult = await db
         .select()

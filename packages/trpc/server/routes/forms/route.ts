@@ -7,8 +7,51 @@ import { generateUniqueSlug } from "@formforge/utils";
 import bcrypt from "bcryptjs";
 import { publicProcedure, protectedProcedure, router } from "../../trpc";
 
+const FormSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  userId: z.string(),
+  isPublished: z.boolean().nullable(),
+  visibility: z.string().nullable(),
+  theme: z.unknown(),
+  settings: z.unknown(),
+  createdAt: z.date().nullable(),
+  updatedAt: z.date().nullable(),
+});
+
+const FieldSchema = z.object({
+  id: z.string(),
+  formId: z.string(),
+  type: z.string(),
+  label: z.string(),
+  placeholder: z.string().nullable(),
+  description: z.string().nullable(),
+  required: z.boolean().nullable(),
+  order: z.number(),
+  options: z.unknown(),
+  validations: z.unknown(),
+  conditionalLogic: z.unknown(),
+  createdAt: z.date().nullable(),
+});
+
+const FormWithFieldsSchema = FormSchema.extend({ fields: z.array(FieldSchema) });
+
 export const formsRouter = router({
-  create: protectedProcedure.input(CreateFormSchema).mutation(async ({ ctx, input }) => {
+  create: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/forms',
+        tags: ['Forms'],
+        summary: 'Create a new form',
+        protect: true,
+      },
+    })
+    .input(CreateFormSchema)
+    .output(FormSchema)
+    .mutation(async ({ ctx, input }) => {
     const slug = generateUniqueSlug(input.title);
     const [form] = await db
       .insert(forms)
@@ -20,15 +63,38 @@ export const formsRouter = router({
         userId: ctx.user.id,
       })
       .returning();
+    if (!form) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create form' });
     return form;
   }),
 
-  list: protectedProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/forms',
+        tags: ['Forms'],
+        summary: 'List all forms for the authenticated user',
+        protect: true,
+      },
+    })
+    .input(z.object({}))
+    .output(z.array(FormSchema))
+    .query(async ({ ctx }) => {
     return db.select().from(forms).where(eq(forms.userId, ctx.user.id));
   }),
 
   getById: publicProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/forms/{formId}',
+        tags: ['Forms'],
+        summary: 'Get form by ID',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(FormWithFieldsSchema.nullable())
     .query(async ({ input, ctx }) => {
       const [form] = await db.select().from(forms).where(eq(forms.id, input.formId));
       if (!form) return null;
@@ -41,7 +107,19 @@ export const formsRouter = router({
       return { ...form, fields: formFields };
     }),
 
-  getBySlug: publicProcedure.input(z.object({ slug: z.string() })).query(async ({ input }) => {
+  getBySlug: publicProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/public/forms/{slug}',
+        tags: ['Forms'],
+        summary: 'Get published form by slug (public)',
+        protect: false,
+      },
+    })
+    .input(z.object({ slug: z.string() }))
+    .output(FormWithFieldsSchema.nullable())
+    .query(async ({ input }) => {
     const [form] = await db.select().from(forms).where(eq(forms.slug, input.slug));
     if (!form || !form.isPublished) return null;
 
@@ -51,7 +129,17 @@ export const formsRouter = router({
   }),
 
   update: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'PATCH',
+        path: '/forms/{formId}',
+        tags: ['Forms'],
+        summary: 'Update a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }).merge(UpdateFormSchema))
+    .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
       const { formId, ...data } = input;
       const [form] = await db
@@ -59,11 +147,22 @@ export const formsRouter = router({
         .set({ ...data, updatedAt: new Date() })
         .where(and(eq(forms.id, formId), eq(forms.userId, ctx.user.id)))
         .returning();
+      if (!form) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });
       return form;
     }),
 
   publish: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/forms/{formId}/publish',
+        tags: ['Forms'],
+        summary: 'Publish a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
       const formFields = await db
         .select({ id: fields.id })
@@ -82,29 +181,61 @@ export const formsRouter = router({
         .set({ isPublished: true, updatedAt: new Date() })
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
         .returning();
+      if (!form) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });
       return form;
     }),
 
   unpublish: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/forms/{formId}/unpublish',
+        tags: ['Forms'],
+        summary: 'Unpublish a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
       const [form] = await db
         .update(forms)
         .set({ isPublished: false, updatedAt: new Date() })
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
         .returning();
+      if (!form) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });
       return form;
     }),
 
   delete: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'DELETE',
+        path: '/forms/{formId}',
+        tags: ['Forms'],
+        summary: 'Delete a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(z.object({ success: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       await db.delete(forms).where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
       return { success: true };
     }),
 
   clone: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/forms/{formId}/clone',
+        tags: ['Forms'],
+        summary: 'Clone a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
       const [original] = await db
         .select()
@@ -151,6 +282,15 @@ export const formsRouter = router({
     }),
 
   updateSlug: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'PATCH',
+        path: '/forms/{formId}/slug',
+        tags: ['Forms'],
+        summary: 'Update form slug',
+        protect: true,
+      },
+    })
     .input(
       z.object({
         formId: z.string().uuid(),
@@ -161,6 +301,7 @@ export const formsRouter = router({
           .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
       }),
     )
+    .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
       const [existing] = await db
         .select({ id: forms.id })
@@ -173,11 +314,22 @@ export const formsRouter = router({
         .set({ slug: input.slug, updatedAt: new Date() })
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
         .returning();
+      if (!form) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });
       return form;
     }),
 
   updatePassword: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'PATCH',
+        path: '/forms/{formId}/password',
+        tags: ['Forms'],
+        summary: 'Set or remove form password',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid(), password: z.string().min(4).nullable() }))
+    .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
       let settingsPatch: Record<string, unknown>;
       if (input.password === null) {
@@ -201,11 +353,22 @@ export const formsRouter = router({
         .set({ settings: merged, updatedAt: new Date() })
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
         .returning();
+      if (!form) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });
       return form;
     }),
 
   verifyFormPassword: publicProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/public/forms/{formId}/verify-password',
+        tags: ['Forms'],
+        summary: 'Verify form password (public)',
+        protect: false,
+      },
+    })
     .input(z.object({ formId: z.string().uuid(), password: z.string() }))
+    .output(z.object({ valid: z.boolean() }))
     .mutation(async ({ input }) => {
       const [form] = await db
         .select({ settings: forms.settings })
@@ -219,7 +382,19 @@ export const formsRouter = router({
       return { valid };
     }),
 
-  generateSlug: publicProcedure.input(z.object({ title: z.string() })).query(({ input }) => {
+  generateSlug: publicProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/forms/generate-slug',
+        tags: ['Forms'],
+        summary: 'Generate a unique slug from a title',
+        protect: false,
+      },
+    })
+    .input(z.object({ title: z.string() }))
+    .output(z.object({ slug: z.string() }))
+    .query(({ input }) => {
     return { slug: generateUniqueSlug(input.title) };
   }),
 });

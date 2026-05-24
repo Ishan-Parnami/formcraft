@@ -23,8 +23,31 @@ function checkRateLimit(formId: string, ipHash: string): boolean {
   return true;
 }
 
+const ResponseSchema = z.object({
+  id: z.string(),
+  formId: z.string(),
+  respondentEmail: z.string().nullable(),
+  ipHash: z.string().nullable(),
+  userAgent: z.string().nullable(),
+  answers: z.unknown(),
+  completionTime: z.number().nullable(),
+  createdAt: z.date().nullable(),
+});
+
 export const responsesRouter = router({
-  submit: publicProcedure.input(SubmitResponseSchema).mutation(async ({ input, ctx }) => {
+  submit: publicProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/public/responses',
+        tags: ['Responses'],
+        summary: 'Submit a response to a form (public)',
+        protect: false,
+      },
+    })
+    .input(SubmitResponseSchema)
+    .output(z.object({ success: z.boolean(), responseId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
     const typedCtx = ctx as Context & { req: { ip?: string; headers: Record<string, string> } };
     const ip = typedCtx.req?.ip ?? "unknown";
     const ipHash = hashIp(ip);
@@ -115,7 +138,19 @@ export const responsesRouter = router({
     return { success: true, responseId: response.id };
   }),
 
-  list: protectedProcedure.input(ListResponsesSchema).query(async ({ ctx, input }) => {
+  list: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/forms/{formId}/responses',
+        tags: ['Responses'],
+        summary: 'List responses for a form',
+        protect: true,
+      },
+    })
+    .input(ListResponsesSchema)
+    .output(z.object({ responses: z.array(ResponseSchema), total: z.number(), page: z.number() }))
+    .query(async ({ ctx, input }) => {
     const [form] = await db
       .select()
       .from(forms)
@@ -141,7 +176,17 @@ export const responsesRouter = router({
   }),
 
   getById: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/responses/{responseId}',
+        tags: ['Responses'],
+        summary: 'Get a single response by ID',
+        protect: true,
+      },
+    })
     .input(z.object({ responseId: z.string().uuid() }))
+    .output(ResponseSchema)
     .query(async ({ ctx, input }) => {
       const [response] = await db
         .select()
@@ -159,7 +204,17 @@ export const responsesRouter = router({
     }),
 
   delete: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'DELETE',
+        path: '/responses/{responseId}',
+        tags: ['Responses'],
+        summary: 'Delete a response',
+        protect: true,
+      },
+    })
     .input(z.object({ responseId: z.string().uuid() }))
+    .output(z.object({ success: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       const [response] = await db
         .select()
@@ -178,7 +233,17 @@ export const responsesRouter = router({
     }),
 
   exportCsv: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/forms/{formId}/responses/export',
+        tags: ['Responses'],
+        summary: 'Export responses as CSV',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }))
+    .output(z.string())
     .query(async ({ ctx, input }) => {
       const [form] = await db
         .select()

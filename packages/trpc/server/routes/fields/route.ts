@@ -4,9 +4,34 @@ import db, { fields, forms } from "@formforge/db";
 import { CreateFieldSchema, UpdateFieldSchema, ReorderFieldsSchema } from "@formforge/schemas/form";
 import { protectedProcedure, router } from "../../trpc";
 
+const FieldSchema = z.object({
+  id: z.string(),
+  formId: z.string(),
+  type: z.string(),
+  label: z.string(),
+  placeholder: z.string().nullable(),
+  description: z.string().nullable(),
+  required: z.boolean().nullable(),
+  order: z.number(),
+  options: z.unknown(),
+  validations: z.unknown(),
+  conditionalLogic: z.unknown(),
+  createdAt: z.date().nullable(),
+});
+
 export const fieldsRouter = router({
   create: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/forms/{formId}/fields',
+        tags: ['Fields'],
+        summary: 'Create a field on a form',
+        protect: true,
+      },
+    })
     .input(z.object({ formId: z.string().uuid() }).merge(CreateFieldSchema))
+    .output(FieldSchema)
     .mutation(async ({ ctx, input }) => {
       // Verify form ownership
       const [form] = await db
@@ -34,11 +59,22 @@ export const fieldsRouter = router({
           conditionalLogic: input.conditionalLogic,
         })
         .returning();
+      if (!field) throw new Error("Failed to create field");
       return field;
     }),
 
   update: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'PATCH',
+        path: '/fields/{fieldId}',
+        tags: ['Fields'],
+        summary: 'Update a field',
+        protect: true,
+      },
+    })
     .input(z.object({ fieldId: z.string().uuid() }).merge(UpdateFieldSchema))
+    .output(FieldSchema)
     .mutation(async ({ ctx, input }) => {
       const { fieldId, ...data } = input;
       // Verify ownership via form
@@ -51,11 +87,22 @@ export const fieldsRouter = router({
       if (!form) throw new Error("Unauthorized");
 
       const [updated] = await db.update(fields).set(data).where(eq(fields.id, fieldId)).returning();
+      if (!updated) throw new Error("Failed to update field");
       return updated;
     }),
 
   delete: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'DELETE',
+        path: '/fields/{fieldId}',
+        tags: ['Fields'],
+        summary: 'Delete a field',
+        protect: true,
+      },
+    })
     .input(z.object({ fieldId: z.string().uuid() }))
+    .output(z.object({ success: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       const [field] = await db.select().from(fields).where(eq(fields.id, input.fieldId));
       if (!field) throw new Error("Field not found");
@@ -69,7 +116,19 @@ export const fieldsRouter = router({
       return { success: true };
     }),
 
-  reorder: protectedProcedure.input(ReorderFieldsSchema).mutation(async ({ ctx, input }) => {
+  reorder: protectedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/forms/{formId}/fields/reorder',
+        tags: ['Fields'],
+        summary: 'Reorder fields on a form',
+        protect: true,
+      },
+    })
+    .input(ReorderFieldsSchema)
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
     const [form] = await db
       .select()
       .from(forms)

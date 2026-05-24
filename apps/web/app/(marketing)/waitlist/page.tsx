@@ -58,7 +58,7 @@ export default function WaitlistPage() {
               <form onSubmit={handleSubmit} className="flex gap-2">
                 <Input
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="raj@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

@@ -3,7 +3,7 @@ services:
     name: formforge-web
     runtime: node
     buildCommand: pnpm install && pnpm turbo build --filter=@formforge/web
-    startCommand: node apps/web/.next/standalone/apps/web/server.js
+    startCommand: pnpm --filter @formforge/web start
     healthCheckPath: /
     envVars:
       - key: NODE_ENV

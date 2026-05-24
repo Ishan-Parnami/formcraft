@@ -16,7 +16,11 @@ export const app = express();
 
 app.use(
   cors({
-    origin: env.NODE_ENV === "production" ? false : "*",
+    origin:
+      env.NODE_ENV === "production"
+        ? (env.CORS_ORIGIN ? env.CORS_ORIGIN.split(",").map((o) => o.trim()) : false)
+        : "*",
+    credentials: true,
   }),
 );
 

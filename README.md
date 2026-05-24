@@ -122,28 +122,46 @@ Optional (graceful fallbacks in dev):
 
 ## Deployment
 
-### Frontend → Vercel
+Both frontend and backend are deployed on [Render](https://render.com). Database on [Neon](https://neon.tech).
 
-1. Import the repo in Vercel
-2. Set **Root Directory** to `apps/web`
-3. Add all environment variables
-4. Deploy — `apps/web/vercel.json` configures the build automatically
+### Step 1 — Database (Neon)
 
-### API → Railway
-
-1. Create a new Railway project, connect the repo
-2. Set **Root Directory** to `.` (monorepo root)
-3. Add all environment variables + `PORT=3001`
-4. Railway reads `apps/api/railway.json` for build and start commands
-
-### Database → Neon / Supabase / Railway Postgres
-
-Run migrations after provisioning:
+1. Create a free project at [neon.tech](https://neon.tech)
+2. Copy the connection string from the dashboard
+3. Run migrations and seed from your local machine:
 
 ```bash
-DATABASE_URL=<prod-url> pnpm --filter @formforge/db db:push
-DATABASE_URL=<prod-url> pnpm --filter @formforge/db seed
+DATABASE_URL="postgresql://..." pnpm db:migrate
+DATABASE_URL="postgresql://..." pnpm db:seed
 ```
+
+### Step 2 — Deploy on Render
+
+1. Go to [render.com](https://render.com) → **New → Blueprint**
+2. Connect your GitHub repo — Render will detect `render.yaml` and create both services automatically
+3. Set environment variables for each service:
+
+**`formforge-web` (Frontend)**
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | Neon connection string |
+| `NEXTAUTH_SECRET` | Random 32-char string (`openssl rand -hex 32`) |
+| `NEXTAUTH_URL` | Your Render web URL (e.g. `https://formforge-web.onrender.com`) |
+| `NEXT_PUBLIC_APP_URL` | Same as `NEXTAUTH_URL` |
+
+**`formforge-api` (Backend)**
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | Neon connection string |
+| `NEXTAUTH_SECRET` | Same secret as frontend |
+| `BASE_URL` | Your Render API URL (e.g. `https://formforge-api.onrender.com`) |
+| `CORS_ORIGIN` | Your Render web URL (e.g. `https://formforge-web.onrender.com`) |
+
+> API docs available at `https://formforge-api.onrender.com/docs` after deploy.
+
+> ⚠️ Render free tier spins down after 15 min of inactivity. Open both URLs before a demo to warm them up.
 
 ---
 

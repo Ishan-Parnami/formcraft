@@ -2,7 +2,7 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: ["./src/index.ts"],
-  noExternal: ["@teachyst"],
+  noExternal: [/@formforge\//],
   splitting: false,
   bundle: true,
   outDir: "./dist",

@@ -94,9 +94,6 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-            <div className="mt-4 p-3 bg-blue-50 rounded-md text-xs text-blue-700">
-              <strong>Demo:</strong> demo@formforge.dev / Demo@1234
-            </div>
           </CardContent>
         </Card>
       </div>

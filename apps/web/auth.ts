@@ -7,6 +7,8 @@ import { eq } from "@formforge/db";
 import db, { users } from "@formforge/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  trustHost: true,
   adapter: DrizzleAdapter(db),
   session: { strategy: "jwt", maxAge: 5 * 24 * 60 * 60 },
   pages: {

@@ -2,7 +2,7 @@ services:
   - type: web
     name: formforge-web
     runtime: node
-    buildCommand: pnpm install && pnpm turbo build --filter=@formforge/web
+    buildCommand: NODE_ENV=development pnpm install && pnpm turbo build --filter=@formforge/web
     startCommand: pnpm --filter @formforge/web start
     healthCheckPath: /
     envVars:
@@ -20,7 +20,7 @@ services:
   - type: web
     name: formforge-api
     runtime: node
-    buildCommand: pnpm install && pnpm turbo build --filter=@formforge/server
+    buildCommand: NODE_ENV=development pnpm install && pnpm turbo build --filter=@formforge/server
     startCommand: node apps/api/dist/index.js
     healthCheckPath: /health
     envVars:

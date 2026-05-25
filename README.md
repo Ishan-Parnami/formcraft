@@ -48,6 +48,12 @@ formforge/
 
 ---
 
+## ER Diagram
+
+![ER diagram](./formForge-er.png)
+
+---
+
 ## Features
 
 - **Form builder** — drag-and-drop field ordering, 10 field types, conditional logic

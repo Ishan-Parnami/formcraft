@@ -58,6 +58,7 @@ const FIELD_TYPES = [
   { type: "single_select", label: "Single Select", icon: ChevronDown },
   { type: "multi_select", label: "Multi Select", icon: List },
   { type: "checkbox", label: "Checkbox", icon: CheckSquare },
+  { type: "dropdown", label: "Dropdown", icon: ChevronDown },
   { type: "rating", label: "Rating", icon: Star },
   { type: "date", label: "Date", icon: Calendar },
 ];

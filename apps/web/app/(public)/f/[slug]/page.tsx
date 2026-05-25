@@ -1,4 +1,6 @@
-import db, { forms } from "@formforge/db";
+import db, { forms, formViews } from "@formforge/db";
+import { createHash } from "node:crypto";
+import { headers } from "next/headers";
 import { eq } from "@formforge/db";
 import type { SelectField } from "@formforge/db";
 import PublicFormClient from "./PublicFormClient";
@@ -13,6 +15,18 @@ async function getPublicForm(slug: string) {
   const snapshotFields = form.publishedSnapshot as unknown as SelectField[];
 
   return { ...form, fields: snapshotFields };
+}
+
+async function trackView(formId: string) {
+  try {
+    const h = await headers();
+    const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? "";
+    const ipHash = ip ? createHash("sha256").update(ip).digest("hex") : null;
+    const referrer = h.get("referer") ?? null;
+    await db.insert(formViews).values({ formId, ipHash, referrer });
+  } catch {
+    // never block form rendering for analytics
+  }
 }
 
 function Unavailable({ message }: { message: string }) {
@@ -44,6 +58,8 @@ export default async function PublicFormPage({ params }: { params: Promise<{ slu
     passwordHash?: unknown;
   };
   const theme = (form.theme ?? {}) as Record<string, unknown>;
+
+  void trackView(form.id);
 
   return <PublicFormClient form={{ ...form, settings: safeSettings }} theme={theme} />;
 }

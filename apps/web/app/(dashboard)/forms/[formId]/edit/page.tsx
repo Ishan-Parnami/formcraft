@@ -114,8 +114,12 @@ function useAutoSave() {
   }, []);
 
   const setError = useCallback(() => setSaveStatus("error"), []);
+  const clearError = useCallback(
+    () => setSaveStatus((prev) => (prev === "error" ? "saved" : prev)),
+    [],
+  );
 
-  return { saveStatus, schedule, lastSaveTime, setError };
+  return { saveStatus, schedule, lastSaveTime, setError, clearError };
 }
 
 function SortableField({
@@ -362,7 +366,7 @@ function FieldConfig({
 export default function FormBuilderPage({ params }: { params: Promise<{ formId: string }> }) {
   const { formId } = use(params);
   const utils = trpc.useUtils();
-  const { saveStatus, schedule, lastSaveTime, setError } = useAutoSave();
+  const { saveStatus, schedule, lastSaveTime, setError, clearError } = useAutoSave();
 
   const { data: formData, isLoading } = trpc.forms.getById.useQuery({ formId });
   const updateForm = trpc.forms.update.useMutation();
@@ -381,6 +385,10 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
       utils.forms.getById.invalidate({ formId });
       setSelectedFieldId(newField.id);
       setMobilePanel("config");
+      if (OPTION_FIELD_TYPES.includes(newField.type) && !(newField.options as unknown[] | null)?.length) {
+        setFieldOptionErrors((prev) => new Set([...prev, newField.id]));
+        setError();
+      }
     },
   });
   const updateField = trpc.fields.update.useMutation();
@@ -404,8 +412,13 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
       .sort()
       .join(",");
     if (incomingIds !== prevFieldIdsRef.current) {
+      const isInitialLoad = prevFieldIdsRef.current === "";
       prevFieldIdsRef.current = incomingIds;
-      setLocalFields([...formData.fields].sort((a, b) => a.order - b.order));
+      const sorted = [...formData.fields].sort((a, b) => a.order - b.order);
+      setLocalFields(sorted);
+      if (isInitialLoad && sorted.length > 0) {
+        setSelectedFieldId(sorted.at(-1)?.id ?? null);
+      }
     }
   }, [formData]);
 
@@ -470,7 +483,36 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
 
   const isPublished = formData?.isPublished ?? false;
   const hasSnapshot = formData?.publishedSnapshot != null;
-  const hasUnpublishedChanges = isPublished && lastSaveTime > lastPublishTime;
+
+  // In-session: any save since last publish click.
+  // After refresh: compare published snapshot with live DB fields (both timestamps reset to 0 on reload).
+  // Field-by-field comparison avoids JSON.stringify key-order issues (Postgres JSONB normalises outer
+  // object key order differently from Drizzle's schema-definition order).
+  const hasUnpublishedChanges = (() => {
+    if (!isPublished) return false;
+    if (lastSaveTime > lastPublishTime) return true;
+    const snapshot = formData?.publishedSnapshot as unknown as Array<Record<string, unknown>> | null | undefined;
+    if (!snapshot) return false;
+    const live = formData?.fields ?? [];
+    if (snapshot.length !== live.length) return true;
+    const ss = [...snapshot].sort((a, b) => (a["order"] as number) - (b["order"] as number));
+    const ls = [...live].sort((a, b) => a.order - b.order);
+    return ss.some((sf, i) => {
+      const lf = ls[i]!;
+      return (
+        sf["id"] !== lf.id ||
+        sf["type"] !== lf.type ||
+        sf["label"] !== lf.label ||
+        (sf["placeholder"] ?? null) !== (lf.placeholder ?? null) ||
+        (sf["description"] ?? null) !== (lf.description ?? null) ||
+        Boolean(sf["required"]) !== Boolean(lf.required) ||
+        Number(sf["order"]) !== lf.order ||
+        JSON.stringify(sf["options"] ?? null) !== JSON.stringify(lf.options ?? null) ||
+        JSON.stringify(sf["validations"] ?? null) !== JSON.stringify(lf.validations ?? null) ||
+        JSON.stringify(sf["conditionalLogic"] ?? null) !== JSON.stringify(lf.conditionalLogic ?? null)
+      );
+    });
+  })();
 
   const canPublish =
     localFields.length > 0 && saveStatus === "saved" && !hasEmptyOptionField;
@@ -678,11 +720,15 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
                     onDelete={() => {
                       const wasSelected = selectedFieldId === field.id;
                       const remaining = localFields.filter((f) => f.id !== field.id);
+                      // Captured at click-time: was this the only field holding an error?
+                      const wasLastError =
+                        fieldOptionErrors.has(field.id) && fieldOptionErrors.size === 1;
                       deleteField.mutate(
                         { fieldId: field.id },
                         {
                           onSuccess: () => {
                             if (wasSelected) setSelectedFieldId(remaining.at(-1)?.id ?? null);
+                            if (wasLastError) clearError();
                           },
                         },
                       );

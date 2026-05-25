@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { trpc } from "~/trpc/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,9 +13,15 @@ import { Card, CardContent } from "~/components/ui/card";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const { update } = useSession();
   const { data: user, isLoading } = trpc.users.me.useQuery({});
   const updateProfile = trpc.users.updateProfile.useMutation({
-    onSuccess: () => toast.success("Profile updated"),
+    onSuccess: async (data) => {
+      await update({ name: data.name });
+      router.refresh();
+      toast.success("Profile updated");
+    },
     onError: () => toast.error("Failed to update profile"),
   });
 

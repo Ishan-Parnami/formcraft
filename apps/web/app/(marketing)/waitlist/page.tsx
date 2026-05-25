@@ -51,7 +51,7 @@ export default function WaitlistPage() {
                 Be the first to know when Pro launches
               </h1>
               <p className="text-gray-500 text-base">
-                Leave your email and{"we'll"} notify you the moment Pro tier goes live with
+                Leave your email and {"we'll"} notify you the moment Pro tier goes live with
                 unlimited forms, advanced analytics, and custom themes.
               </p>
 

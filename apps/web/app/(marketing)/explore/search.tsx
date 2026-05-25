@@ -16,7 +16,7 @@ export default function ExploreSearch({ defaultValue }: { defaultValue?: string 
     startTransition(() => {
       const params = new URLSearchParams();
       if (v) params.set("q", v);
-      router.push(`${pathname}${v ? `?${params.toString()}` : ""}`);
+      router.replace(`${pathname}${v ? `?${params.toString()}` : ""}`);
     });
   }
 

@@ -18,6 +18,7 @@ import {
 } from "~/components/ui/select";
 import type { SelectField } from "@formforge/db";
 import { Star } from "lucide-react";
+import { toast } from "sonner";
 
 interface FieldValue {
   id: string;
@@ -256,7 +257,7 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
       }
     },
     onError: (err) => {
-      alert(err.message);
+      toast.error(err.message);
     },
   });
 

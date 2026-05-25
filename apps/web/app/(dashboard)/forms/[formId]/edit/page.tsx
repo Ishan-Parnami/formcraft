@@ -46,7 +46,9 @@ import {
   Calendar,
   List,
   Palette,
+  AlertTriangle,
 } from "lucide-react";
+
 type TRPCField = NonNullable<RouterOutputs["forms"]["getById"]>["fields"][number];
 type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 
@@ -63,6 +65,8 @@ const FIELD_TYPES = [
   { type: "date", label: "Date", icon: Calendar },
 ];
 
+const OPTION_FIELD_TYPES = ["dropdown", "single_select", "multi_select"];
+
 const SAVE_STATUS_CLASSES: Record<SaveStatus, string> = {
   saved: "text-gray-400",
   saving: "text-blue-500",
@@ -77,10 +81,9 @@ const SAVE_STATUS_LABELS: Record<SaveStatus, string> = {
   error: "Save failed",
 };
 
-// Per-key debounced auto-save — each key (title, field:<id>) has its own timer
-// so rapid edits to different things never cancel each other.
 function useAutoSave() {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
+  const [lastSaveTime, setLastSaveTime] = useState(0);
   const timers = useRef(new Map<string, NodeJS.Timeout>());
   const inFlight = useRef(0);
 
@@ -94,22 +97,25 @@ function useAutoSave() {
         timers.current.delete(key);
         inFlight.current++;
         setSaveStatus("saving");
+        let succeeded = false;
         try {
           await fn();
+          succeeded = true;
         } catch {
           setSaveStatus("error");
-        } finally {
-          inFlight.current--;
-          // Only move to "saved" if there was no error (error state persists)
-          if (inFlight.current === 0) {
-            setSaveStatus((prev) => (prev === "saving" ? "saved" : prev));
-          }
+        }
+        inFlight.current--;
+        if (succeeded && inFlight.current === 0) {
+          setSaveStatus((prev) => (prev === "saving" ? "saved" : prev));
+          setLastSaveTime(Date.now());
         }
       }, 500),
     );
   }, []);
 
-  return { saveStatus, schedule };
+  const setError = useCallback(() => setSaveStatus("error"), []);
+
+  return { saveStatus, schedule, lastSaveTime, setError };
 }
 
 function SortableField({
@@ -193,9 +199,11 @@ function NumberInput({
 function FieldConfig({
   field,
   onUpdate,
+  optionError,
 }: {
   field: TRPCField;
   onUpdate: (data: UpdateFieldInput) => void;
+  optionError?: boolean;
 }) {
   const validations = (field.validations ?? {}) as FieldValidations;
   const options = (field.options ?? []) as FieldOption[];
@@ -319,6 +327,9 @@ function FieldConfig({
               </Button>
             </div>
           ))}
+          {optionError && (
+            <p className="text-xs text-red-500 mt-1">Add at least one option to save this field.</p>
+          )}
         </div>
       )}
 
@@ -338,7 +349,6 @@ function FieldConfig({
         </div>
       )}
 
-      {/* Conditional Logic — coming soon */}
       <div className="pt-2 border-t">
         <div className="flex items-center justify-between py-2">
           <span className="text-sm text-gray-400">Conditional Logic</span>
@@ -352,18 +362,26 @@ function FieldConfig({
 export default function FormBuilderPage({ params }: { params: Promise<{ formId: string }> }) {
   const { formId } = use(params);
   const utils = trpc.useUtils();
-  const { saveStatus, schedule } = useAutoSave();
+  const { saveStatus, schedule, lastSaveTime, setError } = useAutoSave();
 
   const { data: formData, isLoading } = trpc.forms.getById.useQuery({ formId });
   const updateForm = trpc.forms.update.useMutation();
+  const [lastPublishTime, setLastPublishTime] = useState(0);
   const publishForm = trpc.forms.publish.useMutation({
-    onSuccess: () => utils.forms.getById.invalidate({ formId }),
+    onSuccess: () => {
+      setLastPublishTime(Date.now());
+      utils.forms.getById.invalidate({ formId });
+    },
   });
   const unpublishForm = trpc.forms.unpublish.useMutation({
     onSuccess: () => utils.forms.getById.invalidate({ formId }),
   });
   const createField = trpc.fields.create.useMutation({
-    onSuccess: () => utils.forms.getById.invalidate({ formId }),
+    onSuccess: (newField) => {
+      utils.forms.getById.invalidate({ formId });
+      setSelectedFieldId(newField.id);
+      setMobilePanel("config");
+    },
   });
   const updateField = trpc.fields.update.useMutation();
   const deleteField = trpc.fields.delete.useMutation({
@@ -374,11 +392,19 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
   const [title, setTitle] = useState("");
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [localFields, setLocalFields] = useState<TRPCField[]>([]);
+  const [fieldOptionErrors, setFieldOptionErrors] = useState<Set<string>>(new Set());
   const [mobilePanel, setMobilePanel] = useState<"add" | "fields" | "config">("fields");
+  const prevFieldIdsRef = useRef<string>("");
 
   useEffect(() => {
-    if (formData) {
-      setTitle(formData.title);
+    if (!formData) return;
+    setTitle(formData.title);
+    const incomingIds = formData.fields
+      .map((f) => f.id)
+      .sort()
+      .join(",");
+    if (incomingIds !== prevFieldIdsRef.current) {
+      prevFieldIdsRef.current = incomingIds;
       setLocalFields([...formData.fields].sort((a, b) => a.order - b.order));
     }
   }, [formData]);
@@ -392,10 +418,36 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
 
   const handleFieldUpdate = useCallback(
     (fieldId: string, data: UpdateFieldInput) => {
+      const currentField = localFields.find((f) => f.id === fieldId);
+      const effectiveType = (data.type ?? currentField?.type) as string;
+      const mergedOptions =
+        data.options !== undefined
+          ? (data.options as FieldOption[])
+          : ((currentField?.options ?? []) as FieldOption[]);
+
       setLocalFields((prev) => prev.map((f) => (f.id === fieldId ? { ...f, ...data } : f)));
+
+      if (OPTION_FIELD_TYPES.includes(effectiveType) && data.options !== undefined) {
+        if (mergedOptions.length === 0) {
+          setFieldOptionErrors((prev) => new Set([...prev, fieldId]));
+          setError();
+          return;
+        }
+        setFieldOptionErrors((prev) => {
+          if (!prev.has(fieldId)) return prev;
+          const next = new Set(prev);
+          next.delete(fieldId);
+          return next;
+        });
+      }
+
+      if (fieldOptionErrors.has(fieldId) && data.options === undefined) {
+        return;
+      }
+
       schedule(`field:${fieldId}`, () => updateField.mutateAsync({ fieldId, ...data }));
     },
-    [updateField, schedule],
+    [updateField, schedule, localFields, setError, fieldOptionErrors],
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -409,7 +461,28 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
   };
 
   const selectedField = localFields.find((f) => f.id === selectedFieldId);
-  const canPublish = localFields.length > 0 && saveStatus === "saved";
+
+  const hasEmptyOptionField = localFields.some(
+    (f) =>
+      OPTION_FIELD_TYPES.includes(f.type) &&
+      (!(f.options as FieldOption[] | null)?.length),
+  );
+
+  const isPublished = formData?.isPublished ?? false;
+  const hasSnapshot = formData?.publishedSnapshot != null;
+  const hasUnpublishedChanges = isPublished && lastSaveTime > lastPublishTime;
+
+  const canPublish =
+    localFields.length > 0 && saveStatus === "saved" && !hasEmptyOptionField;
+
+  const publishDisabledTitle =
+    localFields.length === 0
+      ? "Add at least one field before publishing"
+      : hasEmptyOptionField
+        ? "Complete all fields before publishing"
+        : saveStatus !== "saved"
+          ? "Save your changes before publishing"
+          : undefined;
 
   if (isLoading) return <div className="p-8 text-gray-500">Loading form builder…</div>;
   if (!formData) return <div className="p-8 text-red-500">Form not found</div>;
@@ -423,7 +496,6 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </Button>
         </Link>
-        {/* <Separator orientation="vertical" className="h-6 shrink-0" /> */}
         <input
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
@@ -448,11 +520,11 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         <Button
           size="sm"
           variant="outline"
-          disabled={!formData.isPublished || saveStatus !== "saved"}
+          disabled={!isPublished || saveStatus !== "saved"}
           title={
             saveStatus !== "saved"
               ? "Save your changes before previewing"
-              : !formData.isPublished
+              : !isPublished
                 ? "Publish the form before previewing"
                 : undefined
           }
@@ -460,33 +532,70 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         >
           <Eye className="h-3 w-3" /> Preview
         </Button>
-        {formData.isPublished ? (
-          <Button
-            size="sm"
-            variant="outline"
-            className="text-red-500 border-red-200"
-            onClick={() => unpublishForm.mutate({ formId })}
-          >
-            <Lock className="h-3 w-3 mr-1" /> Unpublish
-          </Button>
-        ) : (
+
+        {/* Case B & C — published */}
+        {isPublished && (
+          <>
+            {hasUnpublishedChanges ? (
+              <Button
+                size="sm"
+                className="bg-green-600 hover:bg-green-700"
+                disabled={saveStatus !== "saved" || hasEmptyOptionField}
+                title={
+                  saveStatus !== "saved"
+                    ? "Save your changes before republishing"
+                    : hasEmptyOptionField
+                      ? "Complete all fields before publishing"
+                      : undefined
+                }
+                onClick={() => publishForm.mutate({ formId })}
+              >
+                <Globe className="h-3 w-3 mr-1" /> Republish
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-green-600 border-green-200 cursor-default opacity-75"
+                disabled
+              >
+                <Globe className="h-3 w-3 mr-1" /> Published
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-red-500 border-red-200"
+              onClick={() => unpublishForm.mutate({ formId })}
+            >
+              <Lock className="h-3 w-3 mr-1" /> Unpublish
+            </Button>
+          </>
+        )}
+
+        {/* Case A & D — not published */}
+        {!isPublished && (
           <Button
             size="sm"
             className="bg-green-600 hover:bg-green-700"
             disabled={!canPublish}
-            title={
-              localFields.length === 0
-                ? "Add at least one field before publishing"
-                : saveStatus !== "saved"
-                  ? "Save your changes before publishing"
-                  : undefined
-            }
+            title={publishDisabledTitle}
             onClick={() => publishForm.mutate({ formId })}
           >
-            <Globe className="h-3 w-3 mr-1" /> Publish
+            <Globe className="h-3 w-3 mr-1" /> {hasSnapshot ? "Republish" : "Publish"}
           </Button>
         )}
       </div>
+
+      {/* Amber banner — Case C */}
+      {isPublished && hasUnpublishedChanges && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center gap-2 shrink-0">
+          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+          <p className="text-xs text-amber-700">
+            You have unpublished changes — respondents still see the last published version.
+          </p>
+        </div>
+      )}
 
       {/* Mobile tab bar */}
       <div className="md:hidden flex border-b bg-white shrink-0">
@@ -567,8 +676,22 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
                       setMobilePanel("config");
                     }}
                     onDelete={() => {
-                      deleteField.mutate({ fieldId: field.id });
-                      if (selectedFieldId === field.id) setSelectedFieldId(null);
+                      const wasSelected = selectedFieldId === field.id;
+                      const remaining = localFields.filter((f) => f.id !== field.id);
+                      deleteField.mutate(
+                        { fieldId: field.id },
+                        {
+                          onSuccess: () => {
+                            if (wasSelected) setSelectedFieldId(remaining.at(-1)?.id ?? null);
+                          },
+                        },
+                      );
+                      setFieldOptionErrors((prev) => {
+                        if (!prev.has(field.id)) return prev;
+                        const next = new Set(prev);
+                        next.delete(field.id);
+                        return next;
+                      });
                     }}
                   />
                 ))}
@@ -596,6 +719,7 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
               <FieldConfig
                 field={selectedField}
                 onUpdate={(data) => handleFieldUpdate(selectedField.id, data)}
+                optionError={fieldOptionErrors.has(selectedField.id)}
               />
             </>
           ) : (

@@ -1,5 +1,6 @@
-import db, { forms, fields } from "@formforge/db";
+import db, { forms } from "@formforge/db";
 import { eq } from "@formforge/db";
+import type { SelectField } from "@formforge/db";
 import PublicFormClient from "./PublicFormClient";
 
 export const dynamic = "force-dynamic";
@@ -7,14 +8,11 @@ export const dynamic = "force-dynamic";
 async function getPublicForm(slug: string) {
   const [form] = await db.select().from(forms).where(eq(forms.slug, slug));
   if (!form || !form.isPublished) return null;
+  if (!form.publishedSnapshot) return null;
 
-  const formFields = await db
-    .select()
-    .from(fields)
-    .where(eq(fields.formId, form.id))
-    .orderBy(fields.order);
+  const snapshotFields = form.publishedSnapshot as unknown as SelectField[];
 
-  return { ...form, fields: formFields };
+  return { ...form, fields: snapshotFields };
 }
 
 function Unavailable({ message }: { message: string }) {

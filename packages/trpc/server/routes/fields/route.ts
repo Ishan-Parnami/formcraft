@@ -1,8 +1,11 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { eq, and } from "@formforge/db";
 import db, { fields, forms } from "@formforge/db";
 import { CreateFieldSchema, UpdateFieldSchema, ReorderFieldsSchema } from "@formforge/schemas/form";
 import { protectedProcedure, router } from "../../trpc";
+
+const OPTION_FIELD_TYPES = ["dropdown", "single_select", "multi_select"];
 
 const FieldSchema = z.object({
   id: z.string(),
@@ -77,7 +80,6 @@ export const fieldsRouter = router({
     .output(FieldSchema)
     .mutation(async ({ ctx, input }) => {
       const { fieldId, ...data } = input;
-      // Verify ownership via form
       const [field] = await db.select().from(fields).where(eq(fields.id, fieldId));
       if (!field) throw new Error("Field not found");
       const [form] = await db
@@ -85,6 +87,17 @@ export const fieldsRouter = router({
         .from(forms)
         .where(and(eq(forms.id, field.formId), eq(forms.userId, ctx.user.id)));
       if (!form) throw new Error("Unauthorized");
+
+      const effectiveType = data.type ?? field.type;
+      if (OPTION_FIELD_TYPES.includes(effectiveType) && data.options !== undefined) {
+        const opts = data.options as unknown[];
+        if (opts.length === 0) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This field type requires at least one option.",
+          });
+        }
+      }
 
       const [updated] = await db.update(fields).set(data).where(eq(fields.id, fieldId)).returning();
       if (!updated) throw new Error("Failed to update field");

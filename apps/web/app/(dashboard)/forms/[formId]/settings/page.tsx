@@ -12,6 +12,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { ArrowLeft, Copy, Check, ExternalLink, QrCode, Globe2, Zap } from "lucide-react";
 import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -25,6 +26,7 @@ export default function FormSettingsPage({ params }: { params: Promise<{ formId:
   const [passwordValue, setPasswordValue] = useState("");
   const [passwordEnabled, setPasswordEnabled] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const qrRef = useRef<SVGSVGElement>(null);
 
   const settings = (formData?.settings ?? {}) as Record<string, unknown>;
@@ -209,11 +211,10 @@ export default function FormSettingsPage({ params }: { params: Promise<{ formId:
                     key={value}
                     type="button"
                     onClick={() => updateForm.mutate({ formId, visibility: value })}
-                    className={`text-left p-3 rounded-lg border-2 transition-colors ${
-                      active
+                    className={`text-left p-3 rounded-lg border-2 transition-colors ${active
                         ? "border-violet-500 bg-violet-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}
+                      }`}
                   >
                     <div className="text-base mb-0.5">
                       {icon}{" "}
@@ -468,15 +469,21 @@ export default function FormSettingsPage({ params }: { params: Promise<{ formId:
             <Button
               variant="outline"
               className="border-red-300 text-red-500 hover:bg-red-50"
-              onClick={() => {
-                if (confirm("Delete this form and all its responses? This cannot be undone.")) {
-                  deleteForm.mutate({ formId });
-                }
-              }}
+              onClick={() => setDeleteModalOpen(true)}
               disabled={deleteForm.isPending}
             >
               {deleteForm.isPending ? "Deleting…" : "Delete form"}
             </Button>
+            <ConfirmModal
+              isOpen={deleteModalOpen}
+              title="Delete form"
+              description="Delete this form and all its responses? This cannot be undone."
+              confirmLabel="Delete"
+              cancelLabel="Cancel"
+              variant="destructive" 
+              onConfirm={() => { setDeleteModalOpen(false); deleteForm.mutate({ formId }); }} 
+              onCancel={() => setDeleteModalOpen(false)}
+            />
           </CardContent>
         </Card>
       </div>

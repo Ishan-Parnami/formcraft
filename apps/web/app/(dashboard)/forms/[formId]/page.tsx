@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
 import { Edit, BarChart3, MessageSquare, Settings, Eye } from "lucide-react";
+import { CopyButton } from "~/components/ui/CopyButton";
 import db, { forms, fields, responses } from "@formforge/db";
 import { eq, count } from "@formforge/db";
 
@@ -79,6 +80,7 @@ export default async function FormOverviewPage({
             <code className="text-xs bg-white px-3 py-2 rounded border flex-1 truncate">
               {publicUrl}
             </code>
+            <CopyButton text={publicUrl} />
             <Link href={`/f/${form.slug}`} target="_blank">
               <Button size="sm" variant="outline" className="shrink-0">
                 <Eye className="h-3 w-3 mr-1" /> View

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import { MarketingNav } from "~/components/marketing-nav";
 import { Badge } from "~/components/ui/badge";
 import db, { forms, responses } from "@formforge/db";
 import { eq, and, desc, count, ilike, or } from "@formforge/db";
@@ -65,35 +66,7 @@ export default async function ExplorePage({
 
   return (
     <div className="min-h-screen bg-white">
-      <nav className="border-b">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-violet-600">
-            FormForge
-          </Link>
-          <div className="flex gap-3">
-            {session?.user ? (
-              <Link href="/dashboard">
-                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
-                  Go to Dashboard →
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    Log in
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
-                    Get started
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      <MarketingNav isLoggedIn={!!session?.user} />
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-10">

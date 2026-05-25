@@ -28,6 +28,8 @@ import type { RouterOutputs } from "@formforge/trpc/client";
 import type { CreateFieldInput, UpdateFieldInput, FieldValidations, FieldOption } from "@formforge/schemas/form";
 import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
 import { Tooltip, TooltipTrigger, TooltipContent } from "~/components/ui/tooltip";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import { ThemeGallery } from "~/components/theme-gallery";
 import {
   ArrowLeft,
   GripVertical,
@@ -369,7 +371,10 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
   const { saveStatus, schedule, lastSaveTime, setError, clearError } = useAutoSave();
 
   const { data: formData, isLoading } = trpc.forms.getById.useQuery({ formId });
-  const updateForm = trpc.forms.update.useMutation();
+  const themesQuery = trpc.themes.list.useQuery({});
+  const updateForm = trpc.forms.update.useMutation({
+    onSuccess: () => utils.forms.getById.invalidate({ formId }),
+  });
   const [lastPublishTime, setLastPublishTime] = useState(0);
   const publishForm = trpc.forms.publish.useMutation({
     onSuccess: () => {
@@ -402,6 +407,7 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
   const [localFields, setLocalFields] = useState<TRPCField[]>([]);
   const [fieldOptionErrors, setFieldOptionErrors] = useState<Set<string>>(new Set());
   const [mobilePanel, setMobilePanel] = useState<"add" | "fields" | "config">("fields");
+  const [themeOpen, setThemeOpen] = useState(false);
   const prevFieldIdsRef = useRef<string>("");
 
   useEffect(() => {
@@ -491,8 +497,11 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
   const hasUnpublishedChanges = (() => {
     if (!isPublished) return false;
     if (lastSaveTime > lastPublishTime) return true;
-    const snapshot = formData?.publishedSnapshot as unknown as Array<Record<string, unknown>> | null | undefined;
-    if (!snapshot) return false;
+    const raw = formData?.publishedSnapshot as unknown;
+    if (!raw) return false;
+    const snapshot: Array<Record<string, unknown>> = Array.isArray(raw)
+      ? raw
+      : ((raw as { fields?: Array<Record<string, unknown>> }).fields ?? []);
     const live = formData?.fields ?? [];
     if (snapshot.length !== live.length) return true;
     const ss = [...snapshot].sort((a, b) => (a["order"] as number) - (b["order"] as number));
@@ -548,16 +557,27 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
           {SAVE_STATUS_LABELS[saveStatus]}
         </span>
         <Separator orientation="vertical" className="h-6" />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="shrink-0">
-              <Button size="sm" variant="ghost" disabled className="gap-1 cursor-not-allowed opacity-60 pointer-events-none">
-                <Palette className="h-3 w-3" /> Theme
-              </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>Coming soon</TooltipContent>
-        </Tooltip>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="gap-1 shrink-0"
+          onClick={() => setThemeOpen(true)}
+        >
+          <Palette className="h-3 w-3" />
+          {(() => {
+            const current = formData?.theme as Record<string, unknown> | null | undefined;
+            if (!current) return "Theme";
+            const match = themesQuery.data?.find((p) => {
+              const c = p.config as Record<string, unknown>;
+              return (
+                c.primaryColor === current.primaryColor &&
+                c.bgColor === current.bgColor &&
+                c.textColor === current.textColor
+              );
+            });
+            return match ? match.name : "Theme";
+          })()}
+        </Button>
         <Separator orientation="vertical" className="h-6" />
         <Button
           size="sm"
@@ -775,6 +795,25 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
           )}
         </div>
       </div>
+
+      <Dialog open={themeOpen} onOpenChange={setThemeOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Choose a theme</DialogTitle>
+          </DialogHeader>
+          <ThemeGallery
+            currentTheme={(formData?.theme as Record<string, unknown> | null | undefined) ?? null}
+            presets={themesQuery.data ?? []}
+            isLoading={themesQuery.isLoading}
+            onSelect={(config) => {
+              schedule("theme", () =>
+                updateForm.mutateAsync({ formId, theme: config as Parameters<typeof updateForm.mutate>[0]["theme"] }),
+              );
+              setThemeOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

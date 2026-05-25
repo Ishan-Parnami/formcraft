@@ -12,9 +12,17 @@ async function getPublicForm(slug: string) {
   if (!form || !form.isPublished) return null;
   if (!form.publishedSnapshot) return null;
 
-  const snapshotFields = form.publishedSnapshot as unknown as SelectField[];
+  const raw = form.publishedSnapshot as unknown;
+  // New format: { fields: SelectField[], theme: ThemeConfig | null }
+  // Old format (backward compat): SelectField[]
+  const snapshotFields: SelectField[] = Array.isArray(raw)
+    ? raw
+    : (raw as { fields: SelectField[] }).fields;
+  const snapshotTheme: Record<string, unknown> | null = Array.isArray(raw)
+    ? null
+    : ((raw as { theme?: Record<string, unknown> | null }).theme ?? null);
 
-  return { ...form, fields: snapshotFields };
+  return { ...form, fields: snapshotFields, snapshotTheme };
 }
 
 async function trackView(formId: string) {
@@ -57,7 +65,7 @@ export default async function PublicFormPage({ params }: { params: Promise<{ slu
   const { passwordHash: _, ...safeSettings } = settings as Record<string, unknown> & {
     passwordHash?: unknown;
   };
-  const theme = (form.theme ?? {}) as Record<string, unknown>;
+  const theme = (form.snapshotTheme ?? form.theme ?? {}) as Record<string, unknown>;
 
   void trackView(form.id);
 

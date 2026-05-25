@@ -4,7 +4,7 @@ export const FormThemeConfigSchema = z.object({
   primaryColor: z.string(),
   bgColor: z.string(),
   textColor: z.string(),
-  accentColor: z.string(),
+  accentColor: z.string().optional(),
   fontFamily: z.string(),
   borderRadius: z.number(),
   buttonStyle: z.enum(["filled", "outline", "ghost"]),

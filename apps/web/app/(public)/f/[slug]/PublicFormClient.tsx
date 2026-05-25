@@ -48,23 +48,39 @@ function FieldRenderer({
   value,
   onChange,
   error,
+  primaryColor = "#7c3aed",
+  textColor = "#111827",
+  accentColor = "#6b7280",
+  borderRadius = 8,
 }: {
   field: FieldValue;
   value: unknown;
   onChange: (v: unknown) => void;
   error?: string;
+  primaryColor?: string;
+  textColor?: string;
+  accentColor?: string;
+  borderRadius?: number;
 }) {
   const validations = (field.validations ?? {}) as Record<string, number | string>;
   const options = (field.options ?? []) as Array<{ label: string; value: string }>;
   const maxRating = (validations.max as number) ?? 5;
 
+  const inputStyle: React.CSSProperties = {
+    borderColor: error ? "#ef4444" : primaryColor + "60",
+    borderRadius,
+    color: textColor,
+  };
+
   return (
     <div className="mb-6">
-      <Label className="text-base font-medium mb-1">
+      <Label className="text-base font-medium mb-1" style={{ color: textColor }}>
         {field.label}
         {field.required && <span className="text-red-500 ml-1">*</span>}
       </Label>
-      {field.description && <p className="text-sm text-gray-500 mb-2">{field.description}</p>}
+      {field.description && (
+        <p className="text-sm mb-2" style={{ color: accentColor }}>{field.description}</p>
+      )}
 
       {field.type === "short_text" && (
         <Input
@@ -72,6 +88,7 @@ function FieldRenderer({
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder ?? ""}
           className="mt-1"
+          style={inputStyle}
         />
       )}
 
@@ -82,6 +99,7 @@ function FieldRenderer({
           placeholder={field.placeholder ?? ""}
           rows={4}
           className="mt-1"
+          style={inputStyle}
         />
       )}
 
@@ -92,6 +110,7 @@ function FieldRenderer({
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder ?? "raj@example.com"}
           className="mt-1"
+          style={inputStyle}
         />
       )}
 
@@ -102,6 +121,7 @@ function FieldRenderer({
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder ?? ""}
           className="mt-1"
+          style={inputStyle}
         />
       )}
 
@@ -111,6 +131,7 @@ function FieldRenderer({
           value={(value as string) ?? ""}
           onChange={(e) => onChange(e.target.value)}
           className="mt-1"
+          style={inputStyle}
         />
       )}
 
@@ -299,9 +320,17 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
   const bgColor = (theme.bgColor as string) ?? "#ffffff";
   const primaryColor = (theme.primaryColor as string) ?? "#7c3aed";
   const textColor = (theme.textColor as string) ?? "#111827";
+  const accentColor = (theme.accentColor as string) ?? "#6b7280";
   const borderRadius = (theme.borderRadius as number) ?? 8;
   const fontFamily = (theme.fontFamily as string) ?? "Inter, sans-serif";
   const buttonStyle = (theme.buttonStyle as string) ?? "filled";
+
+  const submitBtnStyle: React.CSSProperties =
+    buttonStyle === "filled"
+      ? { backgroundColor: primaryColor, borderColor: primaryColor, color: "#fff", borderRadius }
+      : buttonStyle === "outline"
+        ? { backgroundColor: "transparent", borderColor: primaryColor, color: primaryColor, borderRadius }
+        : { backgroundColor: "transparent", borderColor: "transparent", color: primaryColor, borderRadius };
 
   return (
     <div style={{ backgroundColor: bgColor, color: textColor, fontFamily, minHeight: "100vh" }}>
@@ -310,10 +339,12 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
           <h1 className="text-3xl font-bold mb-2" style={{ color: textColor }}>
             {form.title}
           </h1>
-          {form.description && <p className="text-gray-500">{form.description}</p>}
+          {form.description && (
+            <p style={{ color: accentColor }}>{form.description}</p>
+          )}
         </div>
 
-        <div className="bg-white shadow-sm p-8" style={{ borderRadius, color: "#111827" }}>
+        <div className="shadow-sm p-8" style={{ backgroundColor: bgColor, borderRadius, color: textColor, fontFamily, border: `1px solid ${primaryColor}20` }}>
           {form.fields.map((field) => (
             <FieldRenderer
               key={field.id}
@@ -330,18 +361,17 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
               value={answers[field.id]}
               onChange={(v) => setAnswers((prev) => ({ ...prev, [field.id]: v }))}
               error={errors[field.id]}
+              primaryColor={primaryColor}
+              textColor={textColor}
+              accentColor={accentColor}
+              borderRadius={borderRadius}
             />
           ))}
 
           <Button
             onClick={handleSubmit}
             disabled={submitResponse.isPending}
-            style={{
-              backgroundColor: buttonStyle === "filled" ? primaryColor : "transparent",
-              borderColor: primaryColor,
-              color: buttonStyle === "filled" ? "#fff" : primaryColor,
-              borderRadius,
-            }}
+            style={submitBtnStyle}
             className="mt-4 w-full border"
           >
             {submitResponse.isPending

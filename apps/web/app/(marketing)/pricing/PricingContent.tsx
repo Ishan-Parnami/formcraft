@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
 import { CheckCircle2 } from "lucide-react";
+import { MarketingNav } from "~/components/marketing-nav";
 
 type Feature = { label: string; comingSoon?: boolean };
 
@@ -18,7 +19,7 @@ const plans = [
     description: "Perfect for personal projects and getting started.",
     features: [
       { label: "3 forms" },
-      { label: "100 responses/month", comingSoon: true },
+      { label: "10 premium themes" },
       { label: "Public & unlisted forms" },
       { label: "CSV export" },
     ] satisfies Feature[],
@@ -37,7 +38,6 @@ const plans = [
       { label: "CSV export" },
       { label: "Custom success pages" },
       { label: "Password-protected forms" },
-      { label: "All 10 premium themes", comingSoon: true },
       { label: "Conditional logic", comingSoon: true },
     ] satisfies Feature[],
     highlight: true,
@@ -108,35 +108,7 @@ export default function PricingContent({ isLoggedIn }: { isLoggedIn: boolean }) 
 
   return (
     <div className="min-h-screen bg-white">
-      <nav className="border-b">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-violet-600">
-            FormForge
-          </Link>
-          <div className="flex gap-3">
-            {isLoggedIn ? (
-              <Link href="/dashboard">
-                <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
-                  Go to Dashboard →
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    Log in
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm" className="bg-violet-600 hover:bg-violet-700">
-                    Get started
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      <MarketingNav isLoggedIn={isLoggedIn} />
 
       <div className="max-w-6xl mx-auto px-4 py-20">
         <h1 className="text-4xl font-bold text-center mb-4">Simple, transparent pricing</h1>
@@ -192,7 +164,7 @@ export default function PricingContent({ isLoggedIn }: { isLoggedIn: boolean }) 
                     <li key={f.label} className="flex items-center gap-2 text-sm">
                       <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
                       <span>{f.label}</span>
-                      {f.comingSoon && (
+                      {(f as Feature).comingSoon && (
                         <span className="ml-auto">
                           <ComingSoonBadge />
                         </span>

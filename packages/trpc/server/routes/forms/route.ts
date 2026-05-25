@@ -165,6 +165,12 @@ export const formsRouter = router({
     .input(z.object({ formId: z.string().uuid() }))
     .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
+      const [currentForm] = await db
+        .select()
+        .from(forms)
+        .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
+      if (!currentForm) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });
+
       const formFields = await db
         .select()
         .from(fields)
@@ -192,9 +198,11 @@ export const formsRouter = router({
         });
       }
 
+      const snapshot = { fields: formFields, theme: currentForm.theme ?? null };
+
       const [form] = await db
         .update(forms)
-        .set({ isPublished: true, publishedSnapshot: formFields, updatedAt: new Date() })
+        .set({ isPublished: true, publishedSnapshot: snapshot, updatedAt: new Date() })
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
         .returning();
       if (!form) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });

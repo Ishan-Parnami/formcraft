@@ -11,7 +11,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
-  const { data: user, isLoading } = trpc.users.me.useQuery();
+  const { data: user, isLoading } = trpc.users.me.useQuery({});
   const updateProfile = trpc.users.updateProfile.useMutation({
     onSuccess: () => toast.success("Profile updated"),
     onError: () => toast.error("Failed to update profile"),

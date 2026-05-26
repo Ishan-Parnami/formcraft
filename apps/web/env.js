@@ -13,7 +13,6 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_API_URL: z.string().optional(),
     NEXT_PUBLIC_APP_URL: z.string().optional(),
-    NEXT_PUBLIC_SERVER_URL: z.string().optional(),
   },
 
   runtimeEnv: {
@@ -24,7 +23,6 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-    NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

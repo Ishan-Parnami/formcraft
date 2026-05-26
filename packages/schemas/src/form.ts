@@ -55,34 +55,6 @@ export const FieldTypeSchema = z.enum([
   "dropdown",
 ]);
 
-const OPTION_FIELD_TYPES = ["dropdown", "single_select", "multi_select"] as const;
-
-export const FormFieldSchema = z
-  .object({
-    id: z.string().uuid(),
-    formId: z.string().uuid(),
-    type: FieldTypeSchema,
-    label: z.string().min(1),
-    placeholder: z.string().optional(),
-    description: z.string().optional(),
-    required: z.boolean().default(false),
-    order: z.number().int(),
-    options: z.array(FieldOptionSchema).optional(),
-    validations: FieldValidationsSchema.optional(),
-    conditionalLogic: ConditionalLogicSchema.optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (
-      (OPTION_FIELD_TYPES as readonly string[]).includes(data.type) &&
-      (!data.options || data.options.length === 0)
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        message: "This field type requires at least one option.",
-        path: ["options"],
-      });
-    }
-  });
 
 export const CreateFieldSchema = z.object({
   type: FieldTypeSchema,
@@ -114,16 +86,11 @@ export const UpdateFormSchema = CreateFormSchema.partial().extend({
   settings: FormSettingsSchema.optional(),
 });
 
-export const PublishFormSchema = z.object({
-  formId: z.string().uuid(),
-});
-
 export type FormThemeConfig = z.infer<typeof FormThemeConfigSchema>;
 export type FormSettings = z.infer<typeof FormSettingsSchema>;
 export type FieldOption = z.infer<typeof FieldOptionSchema>;
 export type FieldValidations = z.infer<typeof FieldValidationsSchema>;
 export type ConditionalLogic = z.infer<typeof ConditionalLogicSchema>;
-export type FormField = z.infer<typeof FormFieldSchema>;
 export type CreateFormInput = z.infer<typeof CreateFormSchema>;
 export type UpdateFormInput = z.infer<typeof UpdateFormSchema>;
 export type CreateFieldInput = z.infer<typeof CreateFieldSchema>;

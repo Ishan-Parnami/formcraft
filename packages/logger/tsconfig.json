@@ -1,3 +1,0 @@
-{
-  "extends": ["@formforge/typescript-config/node.json"]
-}

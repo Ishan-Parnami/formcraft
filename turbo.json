@@ -11,8 +11,7 @@
     "GOOGLE_CLIENT_SECRET",
     "SKIP_ENV_VALIDATION",
     "NEXT_PUBLIC_API_URL",
-    "NEXT_PUBLIC_APP_URL",
-    "NEXT_PUBLIC_SERVER_URL"
+    "NEXT_PUBLIC_APP_URL"
   ],
   "tasks": {
     "build": {

@@ -27,7 +27,6 @@ import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "@formforge/trpc/client";
 import type { CreateFieldInput, UpdateFieldInput, FieldValidations, FieldOption } from "@formforge/schemas/form";
 import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
-import { Tooltip, TooltipTrigger, TooltipContent } from "~/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { ThemeGallery } from "~/components/theme-gallery";
 import {
@@ -50,6 +49,7 @@ import {
   Palette,
   AlertTriangle,
 } from "lucide-react";
+
 type TRPCField = NonNullable<RouterOutputs["forms"]["getById"]>["fields"][number];
 type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 
@@ -555,17 +555,6 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
         <span className={`text-xs shrink-0 ${SAVE_STATUS_CLASSES[saveStatus]}`}>
           {SAVE_STATUS_LABELS[saveStatus]}
         </span>
-        <Separator orientation="vertical" className="h-6" />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="shrink-0">
-              <Button size="sm" variant="ghost" disabled className="gap-1 cursor-not-allowed opacity-60 pointer-events-none">
-                <Palette className="h-3 w-3" /> Theme
-              </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>Coming soon</TooltipContent>
-        </Tooltip>
         <Separator orientation="vertical" className="h-6" />
         <Button
           size="sm"

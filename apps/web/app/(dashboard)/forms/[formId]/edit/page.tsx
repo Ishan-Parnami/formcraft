@@ -497,7 +497,7 @@ export default function FormBuilderPage({ params }: { params: Promise<{ formId: 
     if (!isPublished) return false;
     if (lastSaveTime > lastPublishTime) return true;
     const raw = formData?.publishedSnapshot as unknown;
-    if (!raw) return false;
+    if (!raw) return true; // published but no snapshot — needs republish
     const snapshot: Array<Record<string, unknown>> = Array.isArray(raw)
       ? raw
       : ((raw as { fields?: Array<Record<string, unknown>> }).fields ?? []);

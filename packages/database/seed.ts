@@ -265,6 +265,13 @@ async function seed() {
       insertedFields.push(fInserted[0]!);
     }
 
+    if (formDef.isPublished) {
+      await db
+        .update(forms)
+        .set({ publishedSnapshot: { fields: insertedFields, theme: themeConfig } })
+        .where(eq(forms.id, form.id));
+    }
+
     return { form, fields: insertedFields };
   }
 

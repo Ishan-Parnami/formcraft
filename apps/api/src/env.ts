@@ -4,7 +4,6 @@ const envSchema = z.object({
   PORT: z.string().optional().default("3001"),
   NODE_ENV: z.enum(["development", "production"]).default("development"),
   BASE_URL: z.string().default("http://localhost:3001"),
-  DATABASE_URL: z.string().optional(),
   NEXTAUTH_SECRET: z.string().optional(),
   CORS_ORIGIN: z.string().optional(),
 });

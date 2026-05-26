@@ -5,7 +5,6 @@ import { formsRouter } from "./routes/forms/route";
 import { fieldsRouter } from "./routes/fields/route";
 import { responsesRouter } from "./routes/responses/route";
 import { analyticsRouter } from "./routes/analytics/route";
-import { exploreRouter } from "./routes/explore/route";
 import { themesRouter } from "./routes/themes/route";
 import { usersRouter } from "./routes/users/route";
 
@@ -15,7 +14,6 @@ export const serverRouter = router({
   fields: fieldsRouter,
   responses: responsesRouter,
   analytics: analyticsRouter,
-  explore: exploreRouter,
   themes: themesRouter,
   users: usersRouter,
 });

@@ -32,6 +32,7 @@ const PRESET_THEMES = [
       bgColor: "#0d0d1a",
       primaryColor: "#7c3aed",
       textColor: "#e2e8f0",
+      accentColor: "#a78bfa",
       borderRadius: 12,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -46,6 +47,7 @@ const PRESET_THEMES = [
       bgColor: "#0a1628",
       primaryColor: "#00d4ff",
       textColor: "#cce7ff",
+      accentColor: "#7dd3fc",
       borderRadius: 8,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -60,6 +62,7 @@ const PRESET_THEMES = [
       bgColor: "#ffffff",
       primaryColor: "#ff6600",
       textColor: "#1a1a1a",
+      accentColor: "#6b7280",
       borderRadius: 6,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -74,6 +77,7 @@ const PRESET_THEMES = [
       bgColor: "#0a0a0f",
       primaryColor: "#ff4d6d",
       textColor: "#f0e6d3",
+      accentColor: "#fbbf24",
       borderRadius: 4,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "outline",
@@ -88,6 +92,7 @@ const PRESET_THEMES = [
       bgColor: "#1a0000",
       primaryColor: "#cc0000",
       textColor: "#ffcccc",
+      accentColor: "#fca5a5",
       borderRadius: 2,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -102,6 +107,7 @@ const PRESET_THEMES = [
       bgColor: "#fdf2f8",
       primaryColor: "#ec4899",
       textColor: "#831843",
+      accentColor: "#be185d",
       borderRadius: 16,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -116,6 +122,7 @@ const PRESET_THEMES = [
       bgColor: "#f0fdf4",
       primaryColor: "#16a34a",
       textColor: "#14532d",
+      accentColor: "#166534",
       borderRadius: 10,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -130,6 +137,7 @@ const PRESET_THEMES = [
       bgColor: "#eff6ff",
       primaryColor: "#2563eb",
       textColor: "#1e3a5f",
+      accentColor: "#3b82f6",
       borderRadius: 10,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -144,6 +152,7 @@ const PRESET_THEMES = [
       bgColor: "#fff7ed",
       primaryColor: "#ea580c",
       textColor: "#431407",
+      accentColor: "#9a3412",
       borderRadius: 12,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "filled",
@@ -158,6 +167,7 @@ const PRESET_THEMES = [
       bgColor: "#fafafa",
       primaryColor: "#18181b",
       textColor: "#18181b",
+      accentColor: "#71717a",
       borderRadius: 4,
       fontFamily: "Inter, sans-serif",
       buttonStyle: "outline",
@@ -177,6 +187,8 @@ async function seed() {
     const existing = await db.select().from(themes).where(eq(themes.slug, t.slug));
     if (existing.length === 0) {
       await db.insert(themes).values(t);
+    } else {
+      await db.update(themes).set({ config: t.config, name: t.name, category: t.category }).where(eq(themes.slug, t.slug));
     }
   }
 

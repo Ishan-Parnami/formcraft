@@ -75,7 +75,7 @@ export default function ContactPage() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Talk to Sales</h1>
             <p className="text-gray-500">
-              Tell us about your team and{"we'll"} be in touch within 24 hours.
+              Tell us about your team and {"we'll"} be in touch within 24 hours.
             </p>
             <p className="text-xs text-gray-400 mt-2 italic">
               ✨ This page is built with FormForge — try submitting to see it in action

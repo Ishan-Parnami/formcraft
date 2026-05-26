@@ -1,5 +1,8 @@
-import db, { forms, fields } from "@formforge/db";
+import db, { forms, formViews } from "@formforge/db";
+import { createHash } from "node:crypto";
+import { headers } from "next/headers";
 import { eq } from "@formforge/db";
+import type { SelectField } from "@formforge/db";
 import PublicFormClient from "./PublicFormClient";
 
 export const dynamic = "force-dynamic";
@@ -7,14 +10,31 @@ export const dynamic = "force-dynamic";
 async function getPublicForm(slug: string) {
   const [form] = await db.select().from(forms).where(eq(forms.slug, slug));
   if (!form || !form.isPublished) return null;
+  if (!form.publishedSnapshot) return null;
 
-  const formFields = await db
-    .select()
-    .from(fields)
-    .where(eq(fields.formId, form.id))
-    .orderBy(fields.order);
+  const raw = form.publishedSnapshot as unknown;
+  // New format: { fields: SelectField[], theme: ThemeConfig | null }
+  // Old format (backward compat): SelectField[]
+  const snapshotFields: SelectField[] = Array.isArray(raw)
+    ? raw
+    : (raw as { fields: SelectField[] }).fields;
+  const snapshotTheme: Record<string, unknown> | null = Array.isArray(raw)
+    ? null
+    : ((raw as { theme?: Record<string, unknown> | null }).theme ?? null);
 
-  return { ...form, fields: formFields };
+  return { ...form, fields: snapshotFields, snapshotTheme };
+}
+
+async function trackView(formId: string) {
+  try {
+    const h = await headers();
+    const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? "";
+    const ipHash = ip ? createHash("sha256").update(ip).digest("hex") : null;
+    const referrer = h.get("referer") ?? null;
+    await db.insert(formViews).values({ formId, ipHash, referrer });
+  } catch {
+    // never block form rendering for analytics
+  }
 }
 
 function Unavailable({ message }: { message: string }) {
@@ -45,7 +65,9 @@ export default async function PublicFormPage({ params }: { params: Promise<{ slu
   const { passwordHash: _, ...safeSettings } = settings as Record<string, unknown> & {
     passwordHash?: unknown;
   };
-  const theme = (form.theme ?? {}) as Record<string, unknown>;
+  const theme = (form.snapshotTheme ?? form.theme ?? {}) as Record<string, unknown>;
+
+  void trackView(form.id);
 
   return <PublicFormClient form={{ ...form, settings: safeSettings }} theme={theme} />;
 }

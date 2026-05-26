@@ -44,7 +44,7 @@ export default function NewFormPage() {
   };
 
   return (
-    <div className="p-8 max-w-xl">
+    <div className="p-8 max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Create a new form</h1>
       <Card>
         <CardContent className="p-6">

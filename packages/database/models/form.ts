@@ -13,6 +13,7 @@ export const forms = pgTable("forms", {
   visibility: text("visibility").default("unlisted"),
   theme: jsonb("theme"),
   settings: jsonb("settings"),
+  publishedSnapshot: jsonb("published_snapshot"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { eq, and, ne } from "@formforge/db";
+import { eq, and, ne, asc } from "@formforge/db";
 import db, { forms, fields } from "@formforge/db";
 import { CreateFormSchema, UpdateFormSchema } from "@formforge/schemas/form";
 import { generateUniqueSlug } from "@formforge/utils";
@@ -17,6 +17,7 @@ const FormSchema = z.object({
   visibility: z.string().nullable(),
   theme: z.unknown(),
   settings: z.unknown(),
+  publishedSnapshot: z.unknown(),
   createdAt: z.date().nullable(),
   updatedAt: z.date().nullable(),
 });
@@ -164,10 +165,17 @@ export const formsRouter = router({
     .input(z.object({ formId: z.string().uuid() }))
     .output(FormSchema)
     .mutation(async ({ ctx, input }) => {
+      const [currentForm] = await db
+        .select()
+        .from(forms)
+        .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)));
+      if (!currentForm) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });
+
       const formFields = await db
-        .select({ id: fields.id })
+        .select()
         .from(fields)
-        .where(eq(fields.formId, input.formId));
+        .where(eq(fields.formId, input.formId))
+        .orderBy(asc(fields.order));
 
       if (formFields.length === 0) {
         throw new TRPCError({
@@ -176,9 +184,25 @@ export const formsRouter = router({
         });
       }
 
+      const OPTION_TYPES = ["dropdown", "single_select", "multi_select"];
+      const hasEmptyOptions = formFields.some(
+        (f) =>
+          OPTION_TYPES.includes(f.type) &&
+          (!(f.options as unknown[]) || (f.options as unknown[]).length === 0),
+      );
+      if (hasEmptyOptions) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "All dropdown, select, and checkbox fields must have at least one option before publishing.",
+        });
+      }
+
+      const snapshot = { fields: formFields, theme: currentForm.theme ?? null };
+
       const [form] = await db
         .update(forms)
-        .set({ isPublished: true, updatedAt: new Date() })
+        .set({ isPublished: true, publishedSnapshot: snapshot, updatedAt: new Date() })
         .where(and(eq(forms.id, input.formId), eq(forms.userId, ctx.user.id)))
         .returning();
       if (!form) throw new TRPCError({ code: 'NOT_FOUND', message: 'Form not found' });

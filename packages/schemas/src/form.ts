@@ -4,7 +4,7 @@ export const FormThemeConfigSchema = z.object({
   primaryColor: z.string(),
   bgColor: z.string(),
   textColor: z.string(),
-  accentColor: z.string(),
+  accentColor: z.string().optional(),
   fontFamily: z.string(),
   borderRadius: z.number(),
   buttonStyle: z.enum(["filled", "outline", "ghost"]),
@@ -55,19 +55,34 @@ export const FieldTypeSchema = z.enum([
   "dropdown",
 ]);
 
-export const FormFieldSchema = z.object({
-  id: z.string().uuid(),
-  formId: z.string().uuid(),
-  type: FieldTypeSchema,
-  label: z.string().min(1),
-  placeholder: z.string().optional(),
-  description: z.string().optional(),
-  required: z.boolean().default(false),
-  order: z.number().int(),
-  options: z.array(FieldOptionSchema).optional(),
-  validations: FieldValidationsSchema.optional(),
-  conditionalLogic: ConditionalLogicSchema.optional(),
-});
+const OPTION_FIELD_TYPES = ["dropdown", "single_select", "multi_select"] as const;
+
+export const FormFieldSchema = z
+  .object({
+    id: z.string().uuid(),
+    formId: z.string().uuid(),
+    type: FieldTypeSchema,
+    label: z.string().min(1),
+    placeholder: z.string().optional(),
+    description: z.string().optional(),
+    required: z.boolean().default(false),
+    order: z.number().int(),
+    options: z.array(FieldOptionSchema).optional(),
+    validations: FieldValidationsSchema.optional(),
+    conditionalLogic: ConditionalLogicSchema.optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      (OPTION_FIELD_TYPES as readonly string[]).includes(data.type) &&
+      (!data.options || data.options.length === 0)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message: "This field type requires at least one option.",
+        path: ["options"],
+      });
+    }
+  });
 
 export const CreateFieldSchema = z.object({
   type: FieldTypeSchema,

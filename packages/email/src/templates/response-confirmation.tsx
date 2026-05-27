@@ -1,5 +1,3 @@
-import * as React from "react";
-
 interface ResponseConfirmationEmailProps {
   formTitle: string;
   answers: Array<{ label: string; value: string }>;

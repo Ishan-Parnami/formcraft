@@ -1,5 +1,3 @@
-import * as React from "react";
-
 interface NewResponseEmailProps {
   formTitle: string;
   formId: string;

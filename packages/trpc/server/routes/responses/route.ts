@@ -112,7 +112,7 @@ export const responsesRouter = router({
 
         const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
 
-        if (owner?.email) {
+        if (form.notifyCreatorOnResponse && owner?.email) {
           await sendNewResponseEmail({
             to: owner.email,
             formTitle: form.title,
@@ -123,7 +123,7 @@ export const responsesRouter = router({
           });
         }
 
-        if (input.respondentEmail) {
+        if (form.notifyResponderOnResponse && input.respondentEmail) {
           await sendResponseConfirmationEmail({
             to: input.respondentEmail,
             formTitle: form.title,

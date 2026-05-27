@@ -10,7 +10,7 @@ import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import { ArrowLeft, Copy, Check, ExternalLink, QrCode, Globe2, Zap } from "lucide-react";
+import { ArrowLeft, Copy, Check, ExternalLink, QrCode, Globe2, Zap, Mail } from "lucide-react";
 import { ComingSoonBadge } from "~/components/ui/coming-soon-badge";
 import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { toast } from "sonner";
@@ -441,6 +441,43 @@ export default function FormSettingsPage({ params }: { params: Promise<{ formId:
                 Remove password
               </Button>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Email Notifications */}
+        <Card>
+          <CardContent className="p-5 space-y-4">
+            <h2 className="font-semibold text-sm flex items-center gap-2">
+              <Mail className="h-4 w-4" /> Email Notifications
+            </h2>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Notify me on new response</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Receive an email each time someone submits this form
+                </p>
+              </div>
+              <Switch
+                checked={formData.notifyCreatorOnResponse ?? false}
+                onCheckedChange={(checked) =>
+                  updateForm.mutate({ formId, notifyCreatorOnResponse: checked })
+                }
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Send confirmation to respondent</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Only sent if the form collects an email address
+                </p>
+              </div>
+              <Switch
+                checked={formData.notifyResponderOnResponse ?? false}
+                onCheckedChange={(checked) =>
+                  updateForm.mutate({ formId, notifyResponderOnResponse: checked })
+                }
+              />
+            </div>
           </CardContent>
         </Card>
 

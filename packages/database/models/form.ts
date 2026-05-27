@@ -14,6 +14,8 @@ export const forms = pgTable("forms", {
   theme: jsonb("theme"),
   settings: jsonb("settings"),
   publishedSnapshot: jsonb("published_snapshot"),
+  notifyCreatorOnResponse: boolean("notify_creator_on_response").default(false),
+  notifyResponderOnResponse: boolean("notify_responder_on_response").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

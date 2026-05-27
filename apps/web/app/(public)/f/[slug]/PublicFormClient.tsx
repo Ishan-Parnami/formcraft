@@ -306,10 +306,13 @@ export default function PublicFormClient({ form, theme }: PublicFormClientProps)
   const handleSubmit = () => {
     if (!validate()) return;
     const completionTime = Math.round((Date.now() - startTime) / 1000);
+    const emailField = form.fields.find((f) => f.type === "email");
+    const respondentEmail = emailField ? (answers[emailField.id] as string | undefined) : undefined;
     submitResponse.mutate({
       formId: form.id,
       answers,
       completionTime,
+      respondentEmail: respondentEmail || undefined,
     });
   };
 

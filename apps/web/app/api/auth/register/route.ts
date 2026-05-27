@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { eq } from "@formforge/db";
 import db, { users } from "@formforge/db";
 import { RegisterSchema } from "@formforge/schemas/user";
+import { sendWelcomeEmail } from "@formforge/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,13 @@ export async function POST(req: NextRequest) {
       .returning();
     const user = insertResult[0];
     if (!user) return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
+
+    const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
+    void sendWelcomeEmail({
+      to: user.email!,
+      name: user.name ?? "there",
+      dashboardUrl: `${appUrl}/dashboard`,
+    });
 
     return NextResponse.json({ id: user.id, email: user.email, name: user.name }, { status: 201 });
   } catch (err) {

@@ -103,6 +103,9 @@ importers:
       '@formforge/db':
         specifier: workspace:*
         version: link:../../packages/database
+      '@formforge/email':
+        specifier: workspace:*
+        version: link:../../packages/email
       '@formforge/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas

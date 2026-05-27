@@ -18,6 +18,8 @@ const FormSchema = z.object({
   theme: z.unknown(),
   settings: z.unknown(),
   publishedSnapshot: z.unknown(),
+  notifyCreatorOnResponse: z.boolean().nullable(),
+  notifyResponderOnResponse: z.boolean().nullable(),
   createdAt: z.date().nullable(),
   updatedAt: z.date().nullable(),
 });

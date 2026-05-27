@@ -84,6 +84,8 @@ export const CreateFormSchema = z.object({
 export const UpdateFormSchema = CreateFormSchema.partial().extend({
   theme: FormThemeConfigSchema.optional(),
   settings: FormSettingsSchema.optional(),
+  notifyCreatorOnResponse: z.boolean().optional(),
+  notifyResponderOnResponse: z.boolean().optional(),
 });
 
 export type FormThemeConfig = z.infer<typeof FormThemeConfigSchema>;

@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import * as React from "react";
 import { NewResponseEmail } from "./templates/new-response";
 import { ResponseConfirmationEmail } from "./templates/response-confirmation";
+import { WelcomeEmail } from "./templates/welcome";
 
 export interface SendEmailOptions {
   to: string;
@@ -63,6 +64,18 @@ export async function sendResponseConfirmationEmail(opts: {
       formTitle: opts.formTitle,
       answers: opts.answers,
     }),
+  });
+}
+
+export async function sendWelcomeEmail(opts: {
+  to: string;
+  name: string;
+  dashboardUrl: string;
+}): Promise<void> {
+  await sendEmail({
+    to: opts.to,
+    subject: "Welcome to FormForge!",
+    react: React.createElement(WelcomeEmail, { name: opts.name, dashboardUrl: opts.dashboardUrl }),
   });
 }
 

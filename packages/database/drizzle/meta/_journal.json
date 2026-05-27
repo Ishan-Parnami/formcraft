@@ -15,6 +15,13 @@
       "when": 1779714399454,
       "tag": "0001_sleepy_photon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779861106830,
+      "tag": "0002_blushing_aaron_stack",
+      "breakpoints": true
     }
   ]
 }
